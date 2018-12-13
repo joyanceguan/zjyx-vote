@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import com.zjyx.vote.api.enums.Sex;
+import com.zjyx.vote.api.model.enums.Sex;
 
 
 public class SexTypeHandler extends BaseTypeHandler<Sex> {

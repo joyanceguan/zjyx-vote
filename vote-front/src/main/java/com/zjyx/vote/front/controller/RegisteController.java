@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zjyx.vote.api.enums.Sex;
-import com.zjyx.vote.api.enums.User_Source;
-import com.zjyx.vote.api.persistence.User;
+import com.zjyx.vote.api.model.enums.Sex;
+import com.zjyx.vote.api.model.enums.User_Source;
+import com.zjyx.vote.api.model.persistence.User;
 import com.zjyx.vote.api.transaction.IUserTransSerivce;
 import com.zjyx.vote.common.constants.Regex;
 import com.zjyx.vote.common.constants.VoteConstants;

@@ -2,9 +2,9 @@ package com.zjyx.vote.front.param;
 
 import java.util.List;
 
-import com.zjyx.vote.api.dto.VoteDto;
-import com.zjyx.vote.api.persistence.VoteOption;
-import com.zjyx.vote.common.model.VoteRuleDto;
+import com.zjyx.vote.api.model.dto.VoteDto;
+import com.zjyx.vote.api.model.dto.VoteRuleDto;
+import com.zjyx.vote.api.model.persistence.VoteOption;
 
 
 public class VoteParam {

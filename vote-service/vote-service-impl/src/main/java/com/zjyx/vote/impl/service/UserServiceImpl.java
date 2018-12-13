@@ -4,8 +4,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import com.zjyx.vote.api.condition.UserCdtn;
-import com.zjyx.vote.api.persistence.User;
+import com.zjyx.vote.api.model.condition.UserCdtn;
+import com.zjyx.vote.api.model.persistence.User;
 import com.zjyx.vote.api.service.IUserService;
 import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.PageInfo;

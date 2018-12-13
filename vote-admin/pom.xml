@@ -7,4 +7,52 @@
   </parent>
   <artifactId>vote-admin</artifactId>
   <packaging>war</packaging>
+  
+  <dependencies>
+     <dependency>
+		<groupId>com.zjyx</groupId>
+		<artifactId>authority-service-api</artifactId>
+	 </dependency>
+	 <dependency>
+		<groupId>com.zjyx</groupId>
+		<artifactId>authority-service-impl</artifactId>
+	 </dependency>
+     <dependency>
+		<groupId>com.zjyx</groupId>
+		<artifactId>vote-service-api</artifactId>
+	 </dependency>
+	 <dependency>
+		<groupId>com.zjyx</groupId>
+		<artifactId>vote-service-impl</artifactId>
+	 </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+         <dependency>
+              <groupId>org.freemarker</groupId>
+              <artifactId>freemarker</artifactId>
+         </dependency>
+        <dependency>
+          <groupId>net.arccode</groupId>
+          <artifactId>fastdfs-client-java</artifactId>
+        </dependency>
+        <dependency>
+		    <groupId>dom4j</groupId>
+		    <artifactId>dom4j</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+  </dependencies>
+  
+  <build>
+    <finalName>vote_admin</finalName>
+  </build>
 </project>

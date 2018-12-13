@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import com.zjyx.vote.api.enums.Vote_Limit_Type;
+import com.zjyx.vote.api.model.enums.Vote_Limit_Type;
 
 
 public class VoteLimitTypeHandler extends BaseTypeHandler<Vote_Limit_Type> {

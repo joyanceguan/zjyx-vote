@@ -21,6 +21,6 @@
 	<!-- 注解 -->
 	<context:annotation-config />
 	<!-- beans xml -->
-	<import resource="spring-mybatis.xml" />
-	<import resource="spring-app.xml" />
+	<import resource="vote-mybatis.xml" />
+	<import resource="vote-app.xml" />
 </beans>

@@ -8,8 +8,8 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.zjyx.vote.api.enums.User_Status;
-import com.zjyx.vote.api.persistence.UserLogin;
+import com.zjyx.vote.api.model.enums.User_Status;
+import com.zjyx.vote.api.model.persistence.UserLogin;
 import com.zjyx.vote.api.service.IUserLoginService;
 import com.zjyx.vote.common.constants.ErrorCode;
 import com.zjyx.vote.common.constants.Regex;

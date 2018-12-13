@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import com.zjyx.vote.api.enums.Vote_Option_Type;
+import com.zjyx.vote.api.model.enums.Vote_Option_Type;
 
 public class VoteOptionTypeHandler extends BaseTypeHandler<Vote_Option_Type> {
 

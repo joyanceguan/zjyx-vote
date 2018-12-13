@@ -1,6 +1,6 @@
 package com.zjyx.vote.front.param;
 
-import com.zjyx.vote.api.enums.Sex;
+import com.zjyx.vote.api.model.enums.Sex;
 
 public class RegisteParam {
 

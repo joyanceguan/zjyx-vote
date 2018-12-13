@@ -87,6 +87,21 @@
 				<artifactId>vote-service-impl</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.zjyx</groupId>
+				<artifactId>authority-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.zjyx</groupId>
+				<artifactId>authority-service-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+	        <dependency>
+				<groupId>com.zjyx</groupId>
+				<artifactId>authority-service-impl</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			
 		<dependency>
 			<groupId>junit</groupId>

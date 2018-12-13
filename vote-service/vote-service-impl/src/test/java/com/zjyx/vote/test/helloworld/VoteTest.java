@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
-import com.zjyx.vote.api.persistence.Vote;
+import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.impl.mapper.VoteMapper;
 
 

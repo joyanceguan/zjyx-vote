@@ -1,6 +1,6 @@
 package com.zjyx.vote.impl.mapper;
 
-import com.zjyx.vote.api.persistence.UserLogin;
+import com.zjyx.vote.api.model.persistence.UserLogin;
 
 public interface UserLoginMapper {
 

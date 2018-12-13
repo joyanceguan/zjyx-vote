@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import com.zjyx.vote.api.enums.User_Status;
+import com.zjyx.vote.api.model.enums.User_Status;
 
 
 public class UserStatusTypeHandler extends BaseTypeHandler<User_Status> {

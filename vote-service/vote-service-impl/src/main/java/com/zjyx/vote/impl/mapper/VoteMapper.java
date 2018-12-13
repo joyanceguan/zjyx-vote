@@ -2,8 +2,8 @@ package com.zjyx.vote.impl.mapper;
 
 import java.util.List;
 
-import com.zjyx.vote.api.condition.VoteCdtn;
-import com.zjyx.vote.api.persistence.Vote;
+import com.zjyx.vote.api.model.condition.VoteCdtn;
+import com.zjyx.vote.api.model.persistence.Vote;
 
 public interface VoteMapper {
 

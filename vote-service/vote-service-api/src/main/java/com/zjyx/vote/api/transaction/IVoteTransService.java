@@ -2,11 +2,11 @@ package com.zjyx.vote.api.transaction;
 
 import java.util.List;
 
-import com.zjyx.vote.api.dto.VoteDto;
-import com.zjyx.vote.api.persistence.Vote;
-import com.zjyx.vote.api.persistence.VoteOption;
+import com.zjyx.vote.api.model.dto.VoteDto;
+import com.zjyx.vote.api.model.dto.VoteRuleDto;
+import com.zjyx.vote.api.model.persistence.Vote;
+import com.zjyx.vote.api.model.persistence.VoteOption;
 import com.zjyx.vote.common.model.ReturnData;
-import com.zjyx.vote.common.model.VoteRuleDto;
 
 
 public interface IVoteTransService {

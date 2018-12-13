@@ -9,11 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zjyx.vote.api.condition.UserCdtn;
-import com.zjyx.vote.api.enums.User_Source;
-import com.zjyx.vote.api.enums.User_Status;
-import com.zjyx.vote.api.persistence.User;
-import com.zjyx.vote.api.persistence.UserLogin;
+import com.zjyx.vote.api.model.condition.UserCdtn;
+import com.zjyx.vote.api.model.enums.User_Source;
+import com.zjyx.vote.api.model.enums.User_Status;
+import com.zjyx.vote.api.model.persistence.User;
+import com.zjyx.vote.api.model.persistence.UserLogin;
 import com.zjyx.vote.api.transaction.IUserTransSerivce;
 import com.zjyx.vote.common.constants.Regex;
 import com.zjyx.vote.common.enums.Error_Type;
@@ -32,7 +32,7 @@ public class UserTransServiceImpl implements IUserTransSerivce{
 	@Resource
 	UserLoginMapper userLoginMapper;
 	
-	@Transactional
+	@Transactional("votetm")
 	@Override
 	public ReturnData<Integer> saveUser(String passwd, User user) {
 		ReturnData<Integer> returnData = new ReturnData<Integer>();

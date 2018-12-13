@@ -2,7 +2,7 @@ package com.zjyx.vote.impl.mapper;
 
 import java.util.List;
 
-import com.zjyx.vote.api.persistence.VoteOption;
+import com.zjyx.vote.api.model.persistence.VoteOption;
 
 public interface VoteOptionMapper {
 

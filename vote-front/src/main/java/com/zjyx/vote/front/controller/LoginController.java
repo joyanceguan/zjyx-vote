@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zjyx.vote.api.persistence.UserLogin;
+import com.zjyx.vote.api.model.persistence.UserLogin;
 import com.zjyx.vote.api.service.IUserLoginService;
 import com.zjyx.vote.common.constants.Regex;
 import com.zjyx.vote.common.constants.VoteConstants;

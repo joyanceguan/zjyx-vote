@@ -13,18 +13,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
-import com.zjyx.vote.api.dto.VoteDto;
-import com.zjyx.vote.api.dto.VoteOptionMini;
-import com.zjyx.vote.api.enums.Vote_Option_Type;
-import com.zjyx.vote.api.enums.Vote_Status;
-import com.zjyx.vote.api.persistence.Vote;
-import com.zjyx.vote.api.persistence.VoteOption;
+import com.zjyx.vote.api.model.dto.VoteDto;
+import com.zjyx.vote.api.model.dto.VoteOptionMini;
+import com.zjyx.vote.api.model.dto.VoteRuleDto;
+import com.zjyx.vote.api.model.enums.Vote_Option_Type;
+import com.zjyx.vote.api.model.enums.Vote_Status;
+import com.zjyx.vote.api.model.persistence.Vote;
+import com.zjyx.vote.api.model.persistence.VoteOption;
 import com.zjyx.vote.api.transaction.IVoteTransService;
+import com.zjyx.vote.api.utils.VoteRuleUtils;
 import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.exceptions.TransactionException;
 import com.zjyx.vote.common.model.ReturnData;
-import com.zjyx.vote.common.model.VoteRuleDto;
-import com.zjyx.vote.common.utils.VoteRuleUtils;
 import com.zjyx.vote.impl.mapper.VoteMapper;
 import com.zjyx.vote.impl.mapper.VoteOptionMapper;
 
@@ -37,7 +37,7 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 	@Resource
 	VoteOptionMapper voteOptionMapper;
 
-	@Transactional
+	@Transactional("votetm")
 	@Override
 	public ReturnData<Vote> saveVote(VoteDto voteDto, VoteRuleDto ruleDto, List<VoteOption> voteOptions) {
 		ReturnData<Vote> returnData = new ReturnData<Vote>();
