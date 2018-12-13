@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjyx.vote.impl.mapper.VoteMapper">
+  
+  	<insert id="save" parameterType="vote" keyProperty="id" useGeneratedKeys="true">
+	       insert into vote
+	       (
+               title,
+               begin_time,
+               end_time,
+               status,
+               type,
+               limit_type,
+               limit_rule,
+               option_mini,
+               create_user_id,
+               create_time,
+               update_time
+	       )
+	       values
+	       (
+               #{title},
+               #{begin_time},
+               #{end_time},
+               #{status},
+               #{type},
+               #{limit_type},
+               #{limit_rule},
+               #{option_mini},
+               #{create_user_id},
+               now(),
+               now()
+	       )
+	</insert>
+	
+	<select id="selectById" resultType="vote">
+	    select id,title,begin_time,end_time,status,type,limit_type,limit_rule,
+	    option_mini,create_user_id,create_time,update_time from vote
+	</select>
+	
+    <update id="update">
+        update vote set
+           <if test="begin_time!=null and begin_time!=''">begin_time = #{begin_time},</if>
+           <if test="end_time!=null and end_time!=''">end_time = #{end_time},</if>
+           <if test="title!=null and title!=''">title = #{title},</if>
+           <if test="status!=null and status!=''">status = #{status},</if>
+           <if test="type!=null and type!=''">type = #{type},</if>
+           <if test="option_mini!=null and option_mini!=''">option_mini = #{option_mini},</if>
+           <if test="limit_type!=null and limit_type!=''">limit_type = #{limit_type},</if>
+           <if test="limit_rule!=null and limit_rule!=''">limit_rule = #{limit_rule},</if>
+           update_time = now()  where id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+           delete from vote where id = #{id}
+    </delete>
+	
+	<select id="list" resultType="vote">
+	    select id,title,begin_time,end_time,status,type,limit_type,limit_rule,
+	    option_mini,create_user_id,create_time,update_time from vote
+	    <include refid="listSql" />
+	    order by update_time desc
+        limit #{beginNum},#{onePageSize}
+	</select>
+	
+	<select id="count" resultType="int">
+	    select count(1) from vote
+	    <include refid="listSql" />
+        limit #{beginNum},#{onePageSize}
+	</select>
+	
+	<sql id="listSql">
+	     where 1=1 
+	       <if test="status!=null">and status = #{status}</if>
+	       <if test="limitType!=null">and limit_type = #{limitType}</if>
+	       <if test="createUserId!=null">and create_user_id = #{createUserId}</if>
+	       <if test="title!=null and title!=''">and title = #{title}</if>
+	       <if test="types!=null and types.size()>0">
+                and type in
+                <foreach collection="types" index="index" item="item" open="(" separator="," close=")">  
+                 #{item}  
+                </foreach>
+           </if>
+           <if test="createBeginTime!=null">
+                <![CDATA[and create_time > #{createBeginTime} ]]>
+           </if>
+           <if test="createEndTime!=null">
+                <![CDATA[and create_time < #{createEndTime}]]>
+           </if>
+           <if test="beginTime!=null">
+              <![CDATA[and begin_time <= #{end_time}]]>
+           </if>
+           <if test="endTime!=null">
+              <![CDATA[and end_time >= #{begin_time}]]>
+           </if>
+	 </sql>
+	
+</mapper>
