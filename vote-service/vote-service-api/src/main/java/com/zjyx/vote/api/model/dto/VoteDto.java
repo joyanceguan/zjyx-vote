@@ -2,7 +2,7 @@ package com.zjyx.vote.api.model.dto;
 
 import java.util.Date;
 
-import com.zjyx.vote.api.model.enums.Vote_Type;
+import com.zjyx.vote.api.model.enums.Vote_Choose_Type;
 import com.zjyx.vote.common.utils.DateUtils;
 
 public class VoteDto {
@@ -16,9 +16,11 @@ public class VoteDto {
     //投票结束时间
     private Date endTime;
     //投票类型
-  	private Vote_Type type;
+  	private Vote_Choose_Type voteChooseType;
     //创建人id
   	private Long createUserId;
+  	//投票说明
+  	private String voteExplain;
   	
 	public String getTitle() {
 		return title;
@@ -44,12 +46,6 @@ public class VoteDto {
 	public void setEndTime(String endTime) {
 		this.endTime =  DateUtils.parseDateFromString(endTime,DateUtils.FORMAT3);
 	}
-	public Vote_Type getType() {
-		return type;
-	}
-	public void setType(Vote_Type type) {
-		this.type = type;
-	}
 	public Long getCreateUserId() {
 		return createUserId;
 	}
@@ -62,5 +58,16 @@ public class VoteDto {
 	public void setVoteId(Long voteId) {
 		this.voteId = voteId;
 	}
-  	
+	public Vote_Choose_Type getVoteChooseType() {
+		return voteChooseType;
+	}
+	public void setVoteChooseType(Vote_Choose_Type voteChooseType) {
+		this.voteChooseType = voteChooseType;
+	}
+	public String getVoteExplain() {
+		return voteExplain;
+	}
+	public void setVoteExplain(String voteExplain) {
+		this.voteExplain = voteExplain;
+	}
 }

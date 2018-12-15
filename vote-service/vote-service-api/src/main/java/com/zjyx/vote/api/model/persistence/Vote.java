@@ -1,9 +1,15 @@
 package com.zjyx.vote.api.model.persistence;
 
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.zjyx.vote.api.model.dto.VoteOptionMini;
+import com.zjyx.vote.api.model.dto.VoteRuleDto;
+import com.zjyx.vote.api.model.enums.Vote_Choose_Type;
 import com.zjyx.vote.api.model.enums.Vote_Status;
-import com.zjyx.vote.api.model.enums.Vote_Type;
 import com.zjyx.vote.common.utils.DateUtils;
 
 public class Vote {
@@ -22,8 +28,8 @@ public class Vote {
 	private Date update_time;
 	//状态
 	private Vote_Status status;
-	//投票类型
-	private Vote_Type type;
+	//投票选项类型
+	private Vote_Choose_Type vote_choose_type;
 	//限制类型(二进制数的（从右向左数）1:登录限制 2:ip次数限制 3:频率限制)，有的位置为1
 	private int limit_type;
 	//限制规则(json格式)
@@ -32,6 +38,8 @@ public class Vote {
 	private String option_mini;
 	//创建人id
 	private Long create_user_id;
+	//投票说明
+	private String vote_explain;
 	
 	public Long getId() {
 		return id;
@@ -81,12 +89,6 @@ public class Vote {
 	public void setStatus(Vote_Status status) {
 		this.status = status;
 	}
-	public Vote_Type getType() {
-		return type;
-	}
-	public void setType(Vote_Type type) {
-		this.type = type;
-	}
 	public String getOption_mini() {
 		return option_mini;
 	}
@@ -111,5 +113,27 @@ public class Vote {
 	public void setLimit_type(int limit_type) {
 		this.limit_type = limit_type;
 	}
-    	
+	public Vote_Choose_Type getVote_choose_type() {
+		return vote_choose_type;
+	}
+	public void setVote_choose_type(Vote_Choose_Type vote_choose_type) {
+		this.vote_choose_type = vote_choose_type;
+	}
+	public String getVote_explain() {
+		return vote_explain;
+	}
+	public void setVote_explain(String vote_explain) {
+		this.vote_explain = vote_explain;
+	}
+	public VoteRuleDto getVoteRule(){
+		VoteRuleDto voteRule = null;
+		if(StringUtils.isNotBlank(limit_rule)){
+			voteRule = JSON.parseObject(limit_rule, VoteRuleDto.class);
+		}
+		return voteRule;
+	}
+	public List<VoteOptionMini> getVoteOptionMini(){
+		List<VoteOptionMini> list = JSON.parseArray(option_mini, VoteOptionMini.class);
+		return list;
+	}
 }

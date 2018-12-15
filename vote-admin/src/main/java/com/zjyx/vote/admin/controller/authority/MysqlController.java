@@ -1,4 +1,4 @@
-package com.zjyx.vote.admin.controller;
+package com.zjyx.vote.admin.controller.authority;
 
 import javax.annotation.Resource;
 

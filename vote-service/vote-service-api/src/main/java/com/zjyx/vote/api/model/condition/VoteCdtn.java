@@ -2,8 +2,8 @@ package com.zjyx.vote.api.model.condition;
 
 import java.util.List;
 
+import com.zjyx.vote.api.model.enums.Vote_Choose_Type;
 import com.zjyx.vote.api.model.enums.Vote_Status;
-import com.zjyx.vote.api.model.enums.Vote_Type;
 import com.zjyx.vote.common.model.BasePageCondition;
 
 public class VoteCdtn extends BasePageCondition{
@@ -14,7 +14,7 @@ public class VoteCdtn extends BasePageCondition{
     private String createBeginTime;
     private String createEndTime;
     private Vote_Status status;
-    private List<Vote_Type> types;
+    private List<Vote_Choose_Type> voteChooseTypes;
     private Long limitType;
     private Long createUserId;
       
@@ -54,12 +54,6 @@ public class VoteCdtn extends BasePageCondition{
 	public void setStatus(Vote_Status status) {
 		this.status = status;
 	}
-	public List<Vote_Type> getTypes() {
-		return types;
-	}
-	public void setTypes(List<Vote_Type> types) {
-		this.types = types;
-	}
 	public Long getCreateUserId() {
 		return createUserId;
 	}
@@ -72,5 +66,11 @@ public class VoteCdtn extends BasePageCondition{
 	public void setLimitType(Long limitType) {
 		this.limitType = limitType;
 	}
-      
+	public List<Vote_Choose_Type> getVoteChooseTypes() {
+		return voteChooseTypes;
+	}
+	public void setVoteChooseTypes(List<Vote_Choose_Type> voteChooseTypes) {
+		this.voteChooseTypes = voteChooseTypes;
+	}
+     
 }

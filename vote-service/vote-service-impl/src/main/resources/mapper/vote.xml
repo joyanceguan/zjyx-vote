@@ -9,11 +9,12 @@
                begin_time,
                end_time,
                status,
-               type,
+               vote_choose_type,
                limit_type,
                limit_rule,
                option_mini,
                create_user_id,
+               vote_explain,
                create_time,
                update_time
 	       )
@@ -23,19 +24,20 @@
                #{begin_time},
                #{end_time},
                #{status},
-               #{type},
+               #{vote_choose_type},
                #{limit_type},
                #{limit_rule},
                #{option_mini},
                #{create_user_id},
+               #{vote_explain},
                now(),
                now()
 	       )
 	</insert>
 	
 	<select id="selectById" resultType="vote">
-	    select id,title,begin_time,end_time,status,type,limit_type,limit_rule,
-	    option_mini,create_user_id,create_time,update_time from vote
+	    select id,title,begin_time,end_time,status,vote_choose_type,limit_type,limit_rule,
+	    option_mini,create_user_id,vote_explain,create_time,update_time from vote where id=#{id}
 	</select>
 	
     <update id="update">
@@ -44,10 +46,11 @@
            <if test="end_time!=null and end_time!=''">end_time = #{end_time},</if>
            <if test="title!=null and title!=''">title = #{title},</if>
            <if test="status!=null and status!=''">status = #{status},</if>
-           <if test="type!=null and type!=''">type = #{type},</if>
+           <if test="vote_choose_type!=null and vote_choose_type!=''">vote_choose_type = #{vote_choose_type},</if>
            <if test="option_mini!=null and option_mini!=''">option_mini = #{option_mini},</if>
            <if test="limit_type!=null and limit_type!=''">limit_type = #{limit_type},</if>
            <if test="limit_rule!=null and limit_rule!=''">limit_rule = #{limit_rule},</if>
+           vote_explain = #{vote_explain},
            update_time = now()  where id = #{id}
     </update>
     
@@ -56,8 +59,8 @@
     </delete>
 	
 	<select id="list" resultType="vote">
-	    select id,title,begin_time,end_time,status,type,limit_type,limit_rule,
-	    option_mini,create_user_id,create_time,update_time from vote
+	    select id,title,begin_time,end_time,status,vote_choose_type,limit_type,limit_rule,
+	    option_mini,create_user_id,vote_explain,create_time,update_time from vote
 	    <include refid="listSql" />
 	    order by update_time desc
         limit #{beginNum},#{onePageSize}
@@ -74,9 +77,9 @@
 	       <if test="status!=null">and status = #{status}</if>
 	       <if test="limitType!=null">and limit_type = #{limitType}</if>
 	       <if test="createUserId!=null">and create_user_id = #{createUserId}</if>
-	       <if test="title!=null and title!=''">and title = #{title}</if>
-	       <if test="types!=null and types.size()>0">
-                and type in
+	       <if test="title!=null and title!=''">and title LIKE concat(concat('%',#{title}),'%')</if>
+	       <if test="voteChooseTypes!=null and voteChooseTypes.size()>0">
+                and vote_choose_type in
                 <foreach collection="types" index="index" item="item" open="(" separator="," close=")">  
                  #{item}  
                 </foreach>

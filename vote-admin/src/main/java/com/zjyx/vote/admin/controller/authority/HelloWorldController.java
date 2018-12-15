@@ -1,4 +1,4 @@
-package com.zjyx.vote.admin.controller;
+package com.zjyx.vote.admin.controller.authority;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

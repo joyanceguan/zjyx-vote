@@ -39,7 +39,7 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 
 	@Transactional("votetm")
 	@Override
-	public ReturnData<Vote> saveVote(VoteDto voteDto, VoteRuleDto ruleDto, List<VoteOption> voteOptions) {
+	public ReturnData<Vote> saveVote(VoteDto voteDto, VoteRuleDto voteRule, List<VoteOption> voteOptions) {
 		ReturnData<Vote> returnData = new ReturnData<Vote>();
 		if(voteDto == null || voteOptions == null || voteOptions.isEmpty()){
 			throw new TransactionException(Error_Type.PARAM_ERROR,null,null);
@@ -47,8 +47,8 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 		if(StringUtils.isBlank(voteDto.getTitle())){
 			throw new TransactionException(Error_Type.PARAM_ERROR,null,"标题不能为空");
 		}
-		if(voteDto.getType() == null){
-			throw new TransactionException(Error_Type.PARAM_ERROR,null,"投票类型为空");
+		if(voteDto.getVoteChooseType() == null){
+			throw new TransactionException(Error_Type.PARAM_ERROR,null,"投票选择类型为空");
 		}
 		Date now = new Date();
 		if(voteDto.getEndTime()!=null){
@@ -63,17 +63,17 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 		}
 		int limitType = 0;
 		String limitRule = null;
-		//如果限制类型为空，则不设置限制规则
-		if(ruleDto!=null){
-			if(ruleDto.isIpTimes() && ruleDto.getIpTimesCount() < 1){
-				throw new TransactionException(Error_Type.PARAM_ERROR,null,"无效的ip次数限制");
-			}
-			if(ruleDto.isRate() && ruleDto.getRateCount() < 1){
-				throw new TransactionException(Error_Type.PARAM_ERROR,null,"无效的rate次数");
-			}
-		    limitType = VoteRuleUtils.getLimitType(ruleDto);
-		    limitRule = JSON.toJSONString(ruleDto);
- 		}
+		//限制规则判断
+		ReturnData<VoteRuleDto> voteRuleReturnData = VoteRuleUtils.verifyVoteRuleDto(voteRule);
+		Error_Type voteRuleErrorType = voteRuleReturnData.getErrorType();
+		if(voteRuleErrorType == Error_Type.SERVICE_ERROR){
+			voteRule = null;
+		}else if(voteRuleErrorType == Error_Type.PARAM_ERROR){
+			throw new TransactionException(Error_Type.PARAM_ERROR,null,voteRuleReturnData.getErrorMessage());
+		}
+		limitType = VoteRuleUtils.getLimitType(voteRule);
+	    limitRule = JSON.toJSONString(voteRule);
+		
 		List<VoteOptionMini> list = new ArrayList<VoteOptionMini>();
 		for(VoteOption voteOption : voteOptions){
 			Vote_Option_Type type = voteOption.getVote_option_type();
@@ -104,12 +104,13 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 		}
 		Vote vote = new Vote();
 		vote.setTitle(voteDto.getTitle());
-		vote.setType(voteDto.getType());
+		vote.setVote_choose_type(voteDto.getVoteChooseType());
 		vote.setBegin_time(voteDto.getBeginTime());
 		vote.setEnd_time(voteDto.getEndTime());
 		vote.setLimit_rule(limitRule);
 		vote.setLimit_type(limitType);
 		vote.setStatus(Vote_Status.close);
+		vote.setVote_explain(voteDto.getVoteExplain());
 		vote.setOption_mini(JSON.toJSONString(list));
 		if(voteDto.getCreateUserId() == null){
 			//-1代表系统创建
@@ -119,6 +120,7 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 		if(voteDto.getVoteId() == null){
 			flag = voteMapper.save(vote);
 		}else{
+			vote.setId(voteDto.getVoteId());
 			flag = voteMapper.update(vote);
 		}
 		if(flag < 1){

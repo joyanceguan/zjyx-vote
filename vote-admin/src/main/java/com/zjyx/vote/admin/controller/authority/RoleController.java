@@ -1,4 +1,4 @@
-package com.zjyx.vote.admin.controller;
+package com.zjyx.vote.admin.controller.authority;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

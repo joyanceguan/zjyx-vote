@@ -56,5 +56,9 @@ public class ReturnData<T> {
    	this.errorMessage = errorMessage;
    }
    
-   
+   public void setErrorInfo(Error_Type type,String errorCode,String errorMessage){ 
+		this.errorCode = errorCode;
+		this.errorMessage = errorMessage;
+		this.errorType = type;
+  }
 }
