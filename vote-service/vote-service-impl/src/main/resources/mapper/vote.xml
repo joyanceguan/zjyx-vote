@@ -98,4 +98,11 @@
            </if>
 	 </sql>
 	
+	 <select id="selectByIds" resultType="vote">
+	     select id,title,begin_time,end_time,status,vote_choose_type,limit_type,limit_rule,
+	      option_mini,create_user_id,vote_explain,create_time,update_time from vote where id in 
+	      <foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+                 #{item}  
+          </foreach>
+	 </select>
 </mapper>

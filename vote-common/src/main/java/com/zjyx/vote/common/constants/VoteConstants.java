@@ -11,5 +11,6 @@ public class VoteConstants {
 	public final static String USER_SESSION_NAME = "user";
 	//后台session名
 	public final static String ADMIN_USER_SESSION_NAME = "admin";
-
+	//热门投票的时间限定(单位：分钟)
+	public final static int HOT_VOTE_TIME = 24*60;
 }

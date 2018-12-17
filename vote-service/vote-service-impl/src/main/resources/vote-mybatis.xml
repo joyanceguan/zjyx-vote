@@ -43,7 +43,7 @@
         <property name="dataSource" ref="voteDataSource" />  
         <!-- 自动扫描mapping.xml文件 -->  
         <property name="mapperLocations" value="classpath:/mapper/*.xml"></property>  
-        <property name="typeAliasesPackage" value="com.zjyx.vote.api.model.persistence,com.zjyx.vote.api.model.condition" />
+        <property name="typeAliasesPackage" value="com.zjyx.vote.api.model.persistence,com.zjyx.vote.api.model.condition,com.zjyx.vote.api.model.result" />
         <property name="typeHandlersPackage" value="com.zjyx.vote.impl.typehandler" />
     </bean>  
   

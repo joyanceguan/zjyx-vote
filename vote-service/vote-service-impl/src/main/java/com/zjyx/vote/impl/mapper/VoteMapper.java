@@ -19,4 +19,6 @@ public interface VoteMapper {
 	
 	public int count(VoteCdtn voteCdtn);
 	
+	public List<Vote> selectByIds(List<Long> list);
+	
 }

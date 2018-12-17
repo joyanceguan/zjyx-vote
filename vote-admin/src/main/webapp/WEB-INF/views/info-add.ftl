@@ -39,26 +39,26 @@
     <div id="everyoneLimit" <#if vote.voteRule.loginLimit ?? && vote.voteRule.loginLimit == false>style="display:none"</#if>>
     <p class="short-input ue-clear">
     	<label>每人限投：</label>
-        <input type="text" placeholder="每人限投" id="everyone_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="${(vote.voteRule.everyoneCount)!''}"/>
+        <input type="text" placeholder="每人限投" id="everyone_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.everyoneCount!=0>${vote.voteRule.everyoneCount}</#if>"/>
         <span>次数</span>
     </p>
     <p class="short-input ue-clear">
     	<label>投票频率：</label>
-        <input type="text" placeholder="时间（分钟）" style="width: 104px; margin-right: 10px;" id="everyone_time" onkeyup="this.value=this.value.replace(/\D/g,'')" value="${(vote.voteRule.everyoneTime)!''}"/>
-        <input type="text" placeholder="次数" style="width: 104px;" id="everyone_rate_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="${(vote.voteRule.everyoneRateCount)!''}"/>
+        <input type="text" placeholder="时间（分钟）" style="width: 104px; margin-right: 10px;" id="everyone_time" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.everyoneTime!=0>${vote.voteRule.everyoneTime}</#if>"/>
+        <input type="text" placeholder="次数" style="width: 104px;" id="everyone_rate_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.everyoneRateCount!=0>vote.voteRule.everyoneRateCount</#if>"/>
         <span>时间以分钟为单位，例如每天一次 60*24 1</span>
     </p>
     </div>
     <div id="ipLimit" <#if vote.voteRule.loginLimit ?? && vote.voteRule.loginLimit == false><#else>style="display:none"</#if>>
     <p class="short-input ue-clear">
 	    <label>ip限投：</label>
-        <input type="text" placeholder="ip限投次数" id="ip_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="${(vote.voteRule.ipCount)!''}"/>
+        <input type="text" placeholder="ip限投次数" id="ip_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.ipCount!=0>vote.voteRule.ipCount</#if>"/>
         <span>次数 当投票不限制登录时可用</span>
     </p> 
     <p class="short-input ue-clear">
 	    <label>ip投票频率：</label>
-        <input type="text" placeholder="时间（分钟）" style="width: 104px; margin-right: 10px;" id="ip_time" onkeyup="this.value=this.value.replace(/\D/g,'')" value="${(vote.voteRule.ipTime)!''}"/>
-        <input type="text" placeholder="次数" style="width: 104px;" id="ip_rate_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="${(vote.voteRule.ipRateCount)!''}"/>
+        <input type="text" placeholder="时间（分钟）" style="width: 104px; margin-right: 10px;" id="ip_time" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.ipTime!=0>${vote.voteRule.ipTime}</#if>"/>
+        <input type="text" placeholder="次数" style="width: 104px;" id="ip_rate_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.ipRateCount!=0>${vote.voteRule.ipRateCount}</#if>"/>
         <span>时间以分钟为单位，例如每天一次 60*24 1</span>
     </p>
     </div>
@@ -269,6 +269,7 @@ $(".confirm").click(function(){
 		   success:function(data) {
 			   if(data.errorType == 'SUCCESS'){
 				   alert('保存成功');
+				   window.location.href = "/admin/voteList"
 			   }else if(data.errorMessage!=null && data.errorMessage!=''){
 				   alert(data.errorMessage);
 			   }else{

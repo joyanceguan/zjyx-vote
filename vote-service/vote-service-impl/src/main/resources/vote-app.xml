@@ -14,6 +14,14 @@
                         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">  
     <!-- 自动扫描 -->  
     <context:component-scan base-package="com.zjyx.vote.api,com.zjyx.vote.impl" /> 
+    
+    <!-- elasticsearch配置 -->
+    <bean id="esClient" class="com.zjyx.vote.impl.plugin.ESTransportClient">
+        <property name="clusterNodes" value="${clusterNodes}" />
+        <property name="clusterName" value="${clusterName}" />
+        <property name="clientPingTimeout" value="${clientPingTimeout}" />
+        <property name="clientNodesSamplerInterval" value="${clientNodesSamplerInterval}" />
+    </bean>
          
     <!-- 引入配置文件 -->  
     <bean id="propertyConfigurer"  

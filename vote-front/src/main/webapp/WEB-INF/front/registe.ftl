@@ -93,7 +93,7 @@
 			   success:function(data) {
 				   if(data.errorType == 'SUCCESS'){
 					   alert('注册成功');
-					   window.location.href = contextPath+"/index"
+					   window.location.href = contextPath+"/login"
 				   }else if(data.errorType == 'PARAM_ERROR'){
 					   alert(data.errorMessage);
 				   }else {

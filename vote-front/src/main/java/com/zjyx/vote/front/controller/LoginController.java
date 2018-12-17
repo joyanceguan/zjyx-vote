@@ -25,13 +25,13 @@ public class LoginController {
 	@Resource
 	IUserLoginService userLoginService;
 
-	@RequestMapping("/index")
+	@RequestMapping("/login")
 	public ModelAndView index(){
-		ModelAndView mv = new ModelAndView("front/index");
+		ModelAndView mv = new ModelAndView("front/login");
 		return mv;
 	}
 	
-	@RequestMapping("/login")
+	@RequestMapping("/dologin")
 	@ResponseBody
 	public LoginVM login(LoginParam param){
 		LoginVM vm = new LoginVM();

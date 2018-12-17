@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjyx.vote.impl.mapper.VoteRecordMapper">
+  
+  	 <insert id="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
+       INSERT INTO vote_record
+        (
+          id,
+          vote_id,
+          option_id,
+          option_desc,
+          user_id,
+          ip,
+          response_time,
+          see_type,
+          create_time
+        )
+       VALUES
+       <foreach collection="list" item="item" separator=",">
+           (
+             #{item.id}, 
+             #{item.vote_id},
+             #{item.option_id},
+             #{item.option_desc},
+             #{item.user_id},
+             #{item.ip},
+             #{item.response_time},
+             #{item.see_type},
+             now()
+           )
+       </foreach>
+    </insert>
+    
+    <select id="rankList" resultType="voteResult">
+        select vote_id,count(0) as total from vote_record 
+        <if test="beginTime!=null">
+             where <![CDATA[ create_time >= #{beginTime}]]>
+        </if>
+        group by vote_id order by total desc 
+        limit #{beginNum},#{onePageSize}
+    </select>
+    
+    <select id="rankListCount" resultType="int">
+        select count(distinct(vote_id)) from vote_record 
+        <if test="beginTime!=null">
+             where <![CDATA[ create_time >= #{beginTime}]]>
+        </if>
+    </select>
+    
+</mapper>
