@@ -1,6 +1,7 @@
 package com.zjyx.vote.api.service;
 
 import com.zjyx.vote.api.model.condition.VoteCdtn;
+import com.zjyx.vote.api.model.condition.VoteTypeCdn;
 import com.zjyx.vote.api.model.enums.Vote_Status;
 import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.common.model.BasePageCondition;
@@ -20,4 +21,8 @@ public interface IVoteService {
 	
 	//榜单
 	public PageInfo<Vote> rankList(BasePageCondition condition);
+	
+	//分类
+	public PageInfo<Vote> typeList(VoteTypeCdn condition);
+	
 }

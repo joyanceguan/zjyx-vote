@@ -1,7 +1,9 @@
 package com.zjyx.vote.api.model.persistence;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -135,5 +137,16 @@ public class Vote {
 	public List<VoteOptionMini> getVoteOptionMini(){
 		List<VoteOptionMini> list = JSON.parseArray(option_mini, VoteOptionMini.class);
 		return list;
+	}
+	
+	public static Map<Long,Vote> listToMap(List<Vote> voteList){
+		if(voteList == null || voteList.isEmpty()){
+			return null;
+		}
+		Map<Long,Vote> map = new HashMap<Long,Vote>();
+		for(Vote vote:voteList){
+			map.put(vote.getId(), vote);
+		}
+		return map;
 	}
 }

@@ -29,7 +29,6 @@
         <property name="locations">  
             <list>  
                <value>classpath:vote-config.properties</value>  
-               <value>classpath:vote-mysql.properties</value>  
             </list>   
         </property>    
     </bean>      
@@ -41,4 +40,27 @@
 	
 	<!-- aop配置 -->
 	<aop:aspectj-autoproxy />   
+	
+	<!-- redis config start -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="10000" />
+        <property name="maxIdle" value="10" />
+    </bean>
+    <bean id="jedisConnectionFactory"
+           class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy">
+        <property name="hostName" value="${redis.hostname}"/>
+        <property name="port" value="${redis.port}"/>  
+        <property name="timeout" value="${redis.timeout}"/>
+        <property name="usePool" value="true"/>
+        <property name="poolConfig" ref="jedisPoolConfig"/>
+    </bean>
+    <!-- 配置RedisTemplate -->
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory" />
+    </bean>
+    <!-- 配置RedisCacheManager -->
+    <bean id="redisCacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
+        <constructor-arg name="redisOperations" ref="redisTemplate" />
+    </bean>
+    <!-- redis config end -->
 </beans>

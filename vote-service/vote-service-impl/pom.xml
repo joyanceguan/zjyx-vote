@@ -185,5 +185,15 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+        <!-- redis session共享 begin-->
+        <dependency>
+           <groupId>org.springframework.session</groupId>
+           <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+           <groupId>redis.clients</groupId>
+           <artifactId>jedis</artifactId>
+        </dependency>
+        <!-- redis session共享 end-->
   </dependencies>
 </project>
