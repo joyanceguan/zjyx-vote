@@ -140,10 +140,10 @@ public class Vote {
 	}
 	
 	public static Map<Long,Vote> listToMap(List<Vote> voteList){
-		if(voteList == null || voteList.isEmpty()){
-			return null;
-		}
 		Map<Long,Vote> map = new HashMap<Long,Vote>();
+		if(voteList == null || voteList.isEmpty()){
+			return map;
+		}
 		for(Vote vote:voteList){
 			map.put(vote.getId(), vote);
 		}

@@ -33,18 +33,34 @@
     
     <select id="rankList" resultType="voteResult">
         select vote_id,count(0) as total from vote_record 
-        <if test="beginTime!=null">
-             where <![CDATA[ create_time >= #{beginTime}]]>
-        </if>
+        <where>
+          <if test="beginTime!=null">
+             and <![CDATA[ create_time >= #{beginTime}]]>
+          </if>
+          <if test="voteIds!=null and voteIds.size()>0">
+             and vote_id in
+             <foreach collection="voteIds" index="index" item="item" open="(" separator="," close=")">  
+                 #{item}  
+            </foreach>
+          </if>
+        </where>
         group by vote_id order by total desc 
         limit #{beginNum},#{onePageSize}
     </select>
     
     <select id="rankListCount" resultType="int">
         select count(distinct(vote_id)) from vote_record 
-        <if test="beginTime!=null">
-             where <![CDATA[ create_time >= #{beginTime}]]>
-        </if>
+        <where>
+          <if test="beginTime!=null">
+             and <![CDATA[ create_time >= #{beginTime}]]>
+          </if>
+          <if test="voteIds!=null and voteIds.size()>0">
+             and vote_id in
+             <foreach collection="voteIds" index="index" item="item" open="(" separator="," close=")">  
+                 #{item}  
+            </foreach>
+          </if>
+        </where>
     </select>
     
 </mapper>
