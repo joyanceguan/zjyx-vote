@@ -1,7 +1,5 @@
 package com.zjyx.vote.impl.service;
 
-import java.util.Date;
-
 import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.RedisTemplate;
