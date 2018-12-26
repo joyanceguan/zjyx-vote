@@ -3,7 +3,7 @@
 <mapper namespace="com.zjyx.vote.impl.mapper.VoteRecordMapper">
   
   	 <insert id="batchSave" parameterType="java.util.List" useGeneratedKeys="false">
-       INSERT INTO vote_record
+       INSERT INTO #{table_name}
         (
           id,
           vote_id,
@@ -30,6 +30,10 @@
            )
        </foreach>
     </insert>
+    
+    <select id="getVoteIdByUser" resultType="Long">
+        select vote_id from #{table_name} where user_id = #{user_id}
+    </select>
     
     <select id="rankList" resultType="voteResult">
         select vote_id,count(0) as total from vote_record 

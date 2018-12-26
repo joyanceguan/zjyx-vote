@@ -1,7 +1,5 @@
 package com.zjyx.vote.api.service;
 
-import java.util.List;
-
 import com.zjyx.vote.api.model.condition.VoteCdtn;
 import com.zjyx.vote.api.model.condition.VoteTypeCdn;
 import com.zjyx.vote.api.model.enums.Vote_Status;
@@ -28,5 +26,5 @@ public interface IVoteService {
 	public PageInfo<Vote> typeList(VoteTypeCdn condition);
 	
 	//随机
-	public ReturnData<List<Vote>> randomList(int size);
+	public ReturnData<Vote> randomList(Long userId);
 }

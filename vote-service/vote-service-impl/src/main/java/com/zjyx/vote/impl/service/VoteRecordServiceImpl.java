@@ -1,42 +1,33 @@
 package com.zjyx.vote.impl.service;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.zjyx.vote.api.model.constants.RedisKey;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
 import com.zjyx.vote.api.service.IVoteRecordService;
-import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.ReturnData;
-import com.zjyx.vote.impl.mapper.VoteRecordMapper;
+import com.zjyx.vote.common.utils.UUIDUtils;
 
 @Service
 public class VoteRecordServiceImpl implements IVoteRecordService{
-
+   
 	@Resource
-	VoteRecordMapper voteRecordMapper;
+	RedisTemplate<String, Object> redisTemplate;
 	
 	@Override
-	public ReturnData<Integer> saveVoteRecord(List<VoteRecord> voteRecords) {
+	public ReturnData<Integer> save(VoteRecord voteRecord) {
 		ReturnData<Integer> returnData = new ReturnData<Integer>();
-		int success = 0;
-		if(voteRecords == null || voteRecords.isEmpty()){
-			returnData.setErrorInfo(Error_Type.PARAM_ERROR, null, null);
-			return returnData;
-		}
-		Iterator<VoteRecord> iterator = voteRecords.iterator();
-		while(iterator.hasNext()){
-			VoteRecord voteRecord = iterator.next();
-			if(voteRecord == null)
-				iterator.remove();
-		}
-		success = voteRecordMapper.batchSave(voteRecords);
-		returnData.setResultData(success);
+		voteRecord.setId(UUIDUtils.getUUId());
+		//这两个字段放在controller层设置
+//		voteRecord.setCreate_time(new Date());
+//		voteRecord.setIp(ip);
+		redisTemplate.opsForList().leftPush(RedisKey.VOTERECORD_SAVE_KEY, voteRecord);
 		return returnData;
 	}
-
 
 }

@@ -3,7 +3,6 @@ package com.zjyx.vote.impl.service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -23,6 +22,7 @@ import com.zjyx.vote.api.model.enums.Vote_Status;
 import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.api.service.IVoteService;
+import com.zjyx.vote.api.utils.VoteRecordUtils;
 import com.zjyx.vote.common.constants.VoteConstants;
 import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.BasePageCondition;
@@ -152,7 +152,8 @@ public class VoteServiceImpl implements IVoteService{
 		int beginNum = condition.getBeginNum();
 		int onePageSize = condition.getOnePageSize();
 		String redisKey = RedisKey.VOTE_RANK_KEY;
-		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeWithScores(redisKey, beginNum, onePageSize);
+		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(redisKey, 0, -1, beginNum, onePageSize);
+//		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeWithScores(redisKey, beginNum, onePageSize);
 		if(condition.isNeedTotalResults()){
 	    	totalCount = redisTemplate.opsForZSet().zCard(redisKey).intValue();
 	    }
@@ -179,20 +180,37 @@ public class VoteServiceImpl implements IVoteService{
 	}
 
 	@Override
-	public ReturnData<List<Vote>> randomList(int size) {
-		ReturnData<List<Vote>> returnData = new ReturnData<List<Vote>>();
-		if(size < 1 || size > 100){
+	public ReturnData<Vote> randomList(Long userId) {
+		ReturnData<Vote> returnData = new ReturnData<Vote>();
+		//用户必须登录才行
+		if(userId == null){
 			returnData.setErrorType(Error_Type.PARAM_ERROR);
 			return returnData;
 		}
 		String redisKey = RedisKey.VOTE_RANK_KEY;
-		Set<Object> ids= redisTemplate.opsForZSet().range(redisKey, 0, 1000);
-		Object[] values = ids.toArray();
-		Random random = new Random(values.length);
-		Set<Long> randomIndex = new HashSet<Long>();
-//		while(randomIndex.size() < size){
-//			randomIndex.add(random.nextInt());
-//		}
+		int onePageSize = 50;
+		int totalCount = redisTemplate.opsForZSet().zCard(redisKey).intValue();
+		//
+		int index = totalCount > onePageSize ? totalCount - onePageSize : 0;
+		Random random = new Random(index);
+		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(redisKey, 0, -1, random.nextInt(), onePageSize);
+		//获取用户投过票的项目
+		List<Long> voteIdList1 = voteRecordMapper.getVoteIdByUser(VoteRecordUtils.VOTE_RECORD_1, userId);
+		List<Long> voteIdList2 = voteRecordMapper.getVoteIdByUser(VoteRecordUtils.VOTE_RECORD_2, userId);
+		voteIdList1.addAll(voteIdList2);
+		//获取投票id
+		Long randomVoteId = null;
+		for(TypedTuple<Object> type:values){
+			Long voteId = (Long) type.getValue();
+			if(!voteIdList1.contains(voteId)){
+				randomVoteId = voteId;
+			}
+		}
+		Vote vote = null;
+		if(randomVoteId != null){
+		    vote = voteMapper.selectById(randomVoteId);
+		}
+		returnData.setResultData(vote);
 		return returnData;
 	}
 	

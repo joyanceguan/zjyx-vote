@@ -23,6 +23,8 @@ public class VoteRecord {
 	private See_Type see_type;
 	//创建时间
 	private Date create_time;
+	//表名(非数据库字段名)
+	private String table_name;
 	
 	public String getId() {
 		return id;
@@ -77,6 +79,12 @@ public class VoteRecord {
 	}
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+	public String getTable_name() {
+		return table_name;
+	}
+	public void setTable_name(String table_name) {
+		this.table_name = table_name;
 	}
 	
 }
