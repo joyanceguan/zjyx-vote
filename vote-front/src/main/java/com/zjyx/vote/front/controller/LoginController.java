@@ -48,7 +48,7 @@ public class LoginController {
 		ReturnData<UserLogin> returnData = userLoginService.login(param.getEmail(), param.getPassword());
 		UserLogin userLogin = returnData.getResultData();
 		if(userLogin!=null){
-			WebContextHelper.setSessionValue(VoteConstants.USER_SESSION_NAME, userLogin);
+			WebContextHelper.setSessionValue(VoteConstants.USER_SESSION, userLogin);
 		}
 		vm.setErrorInfo(returnData);
 		return vm;
