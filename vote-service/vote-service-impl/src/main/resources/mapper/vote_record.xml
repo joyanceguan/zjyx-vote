@@ -36,7 +36,7 @@
     </select>
     
     <select id="rankList" resultType="voteResult">
-        select vote_id,count(0) as total from vote_record 
+        select vote_id,count(0) as total from #{table_name} 
         <where>
           <if test="beginTime!=null">
              and <![CDATA[ create_time >= #{beginTime}]]>
@@ -53,7 +53,7 @@
     </select>
     
     <select id="rankListCount" resultType="int">
-        select count(distinct(vote_id)) from vote_record 
+        select count(distinct(vote_id)) from #{table_name} 
         <where>
           <if test="beginTime!=null">
              and <![CDATA[ create_time >= #{beginTime}]]>

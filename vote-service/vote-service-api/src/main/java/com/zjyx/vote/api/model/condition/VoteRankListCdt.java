@@ -6,6 +6,8 @@ import java.util.List;
 import com.zjyx.vote.common.model.BasePageCondition;
 
 public class VoteRankListCdt extends BasePageCondition{
+	
+	private String table_name;
 
 	private Date beginTime;
 	
@@ -26,5 +28,14 @@ public class VoteRankListCdt extends BasePageCondition{
 	public void setVoteIds(List<Long> voteIds) {
 		this.voteIds = voteIds;
 	}
+
+	public String getTable_name() {
+		return table_name;
+	}
+
+	public void setTable_name(String table_name) {
+		this.table_name = table_name;
+	}
+	
 	
 }

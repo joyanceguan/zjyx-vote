@@ -41,7 +41,6 @@ public class DateUtils {
 				pattern = StringUtils.isEmpty(pattern)?DEFAULT:pattern;
 				return new SimpleDateFormat(pattern).parse(date);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

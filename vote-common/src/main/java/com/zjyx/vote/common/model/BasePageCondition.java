@@ -37,5 +37,10 @@ public class BasePageCondition {
 		this.onePageSize = onePageSize;
 	}
 	
-	
+	public boolean isRightPageInfo(){
+		if(currentPage < 1 || onePageSize < 1){
+			return false;
+		}
+		return true;
+	}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -31,7 +32,7 @@ public class VoteRecordTransSerivceImpl implements IVoteRecordTransSerivce{
 	
 	@Transactional("votetm")
 	@Override
-	public ReturnData<Integer> batchSave(List<VoteRecord> voteRecords) {
+	public ReturnData<Integer> batchSave(Set<VoteRecord> voteRecords) {
 		ReturnData<Integer> returnData = new ReturnData<Integer>();
 		if(voteRecords == null || voteRecords.isEmpty()){
 			returnData.setErrorInfo(Error_Type.PARAM_ERROR, null, null);

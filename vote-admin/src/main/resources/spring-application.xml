@@ -24,4 +24,5 @@
 	<import resource="authority-mybatis.xml" />
 	<import resource="vote-mybatis.xml" />
 	<import resource="vote-app.xml" />
+	<import resource="spring-quartz.xml" />
 </beans>

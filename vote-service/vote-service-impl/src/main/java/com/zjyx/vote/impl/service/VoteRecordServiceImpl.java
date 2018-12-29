@@ -1,5 +1,7 @@
 package com.zjyx.vote.impl.service;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,13 +10,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.zjyx.vote.api.model.condition.VoteRankListCdt;
 import com.zjyx.vote.api.model.constants.RedisKey;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
+import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.api.service.IVoteRecordService;
 import com.zjyx.vote.common.constants.VoteConstants;
 import com.zjyx.vote.common.enums.Error_Type;
+import com.zjyx.vote.common.model.PageInfo;
 import com.zjyx.vote.common.model.ReturnData;
 import com.zjyx.vote.common.utils.UUIDUtils;
+import com.zjyx.vote.impl.mapper.VoteRecordMapper;
 
 @Service
 public class VoteRecordServiceImpl implements IVoteRecordService{
@@ -23,6 +29,9 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 	
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
+	
+	@Resource
+	VoteRecordMapper voteRecordMapper;
 	
 	@Override
 	public ReturnData<Integer> save(VoteRecord voteRecord) {
@@ -77,7 +86,7 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
     private Long recordToRedis(VoteRecord voteRecord){
     	Long flag = null;
     	try{
-    		flag =redisTemplate.opsForList().leftPush(RedisKey.VOTERECORD_SAVE_KEY, voteRecord);
+    		flag =redisTemplate.opsForSet().add(RedisKey.VOTERECORD_SAVE_KEY, voteRecord);
     	}catch(Exception e){
     		//日志
     		errorLog.error("save redis exception", e);
@@ -95,7 +104,7 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
             }
         	//如果重试几次还不成功,可以异步线程扔进数据库
         	if(flag == null || flag < 1){
-        		// TODO
+        		// JOY TODO
         	}
         }
     }
@@ -131,7 +140,7 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
             }
         	//如果重试几次还不成功,可以异步线程扔进数据库
         	if(flag == null || flag < 1){
-        		// TODO
+        		// JOY TODO
         	}
         }
     }
@@ -140,6 +149,22 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
     	Double flag = countToRedis(voteRecord);
     	resendCountToRedis(voteRecord,flag);
     }
+
+	@Override
+	public PageInfo<VoteResult> rankList(VoteRankListCdt condition) {
+		PageInfo<VoteResult> pageinfo = new PageInfo<VoteResult>();
+		if(condition == null || !condition.isRightPageInfo()){
+			pageinfo.setErrorType(Error_Type.PARAM_ERROR);
+			return pageinfo;
+		}
+		int count = 0;
+		if(condition.isNeedTotalResults()){
+		    count = voteRecordMapper.rankListCount(condition);
+		}
+		List<VoteResult> list = voteRecordMapper.rankList(condition);
+		pageinfo.setPageInfo(condition ,Long.valueOf(count), list, null);
+		return pageinfo;
+	}
 }
 
 
