@@ -155,7 +155,7 @@ public class TypeRankJob {
 							}
 							latch.countDown();
 						}catch (Exception e) {
-							e.printStackTrace();
+							errorLog.error("select mysql exception", e);
 						}
 					}
 				});

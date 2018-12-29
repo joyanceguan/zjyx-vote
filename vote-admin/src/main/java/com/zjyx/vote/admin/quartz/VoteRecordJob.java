@@ -17,7 +17,7 @@ import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.ReturnData;
 
 /**
- * 从redis队列中批量获取投票记录，保存到数据库中
+ * 从redis队列中获取投票记录，批量保存到数据库中
  */
 @Component
 public class VoteRecordJob {
