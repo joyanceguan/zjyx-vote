@@ -1,5 +1,7 @@
 package com.zjyx.vote.front.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
@@ -26,8 +28,8 @@ public class ListController {
 	@RequestMapping("/hotlist")
 	public ModelAndView hotList(BasePageCondition condition){
 		ModelAndView mv = new ModelAndView("front/list");
-		PageInfo<Vote> pageInfo = voteService.hotList(condition);
-		mv.addObject("pageInfo", pageInfo);
+		List<Vote> list = voteService.hotList();
+		mv.addObject("list", list);
 		return mv;
 	}
 	

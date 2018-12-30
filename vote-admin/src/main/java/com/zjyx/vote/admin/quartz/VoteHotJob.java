@@ -18,86 +18,71 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.zjyx.vote.api.model.condition.VoteCdtn;
 import com.zjyx.vote.api.model.condition.VoteRankListCdt;
-import com.zjyx.vote.api.model.condition.VoteTypeCdn;
 import com.zjyx.vote.api.model.constants.RedisKey;
 import com.zjyx.vote.api.model.enums.Vote_Status;
 import com.zjyx.vote.api.model.persistence.Vote;
-import com.zjyx.vote.api.model.persistence.VoteType;
 import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.api.service.IVoteRecordService;
 import com.zjyx.vote.api.service.IVoteService;
-import com.zjyx.vote.api.service.IVoteTypeService;
 import com.zjyx.vote.api.utils.VoteRecordUtils;
-import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.PageInfo;
-import com.zjyx.vote.common.model.ReturnData;
 
 /**
- * 根据投票记录算出每个类型排行前10放入redis中
+ * 热投排行放入redis中
  */
 @Component
-public class TypeRankJob {
+public class VoteHotJob {
 	
 	private static final Logger errorLog = LoggerFactory.getLogger("errorLog");
-
-	@Resource
-	IVoteTypeService voteTypeService;
+	
+	//每个类型算出前多少
+	public final static int rank = 100;
+		
+	//统计多长时间内的排行(分钟为单位)
+	public final static int period = 60*24*365;
+		
+	//发送redis失败重试次数
+	public final static int retryTime = 3;
 	
 	@Resource
 	private ExecutorService typeRankExecutor;
 	
 	@Resource
-	IVoteService voteService; 
+	IVoteRecordService voteRecordService; 
 	
 	@Resource
-	IVoteRecordService voteRecordService; 
+	IVoteService voteService;
 	
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
 	
-	//每个类型算出前多少
-	public final static int rank = 10;
-	
-	//统计多长时间内的排行(分钟为单位)
-	public final static int period = 60*24*365;
-	
-	//发送redis失败重试次数
-	public final static int retryTime = 3;
-	
 	//每1分钟执行一次同步redis
     @Scheduled(cron = "* 0/1 * * * ? ")
-	public void typeRank(){
-    	ReturnData<List<VoteType>> returnData = voteTypeService.selectAll();
-    	if(returnData.getErrorType() == Error_Type.SUCCESS){
-    		List<VoteType> list = returnData.getResultData();
-    		for(VoteType voteType : list){
-    			Integer typeId = voteType.getId();
-    			//投票id和投票记录表对对号入座
-    			Map<String,List<Long>> map = getRecordMap(typeId);
-    			//算排行数据
-    			List<VoteResult> rankedList = getVoteRank(map,typeId);
-    			//组装数据发送redis
-    			sendToRedis(rankedList,typeId);
-    		}
-    	}
-    }
+	public void voteHot(){
+    	//投票id和投票记录表对对号入座
+    	Map<String,List<Long>> map = getRecordMap();
+    	//算排行数据
+    	List<VoteResult> rankedList = getVoteRank(map);
+    	//组装数据发送redis
+    	sendToRedis(rankedList);
+	}
     
     /**
      * 查找该类型的投票表的所有数据，并拿到每个投票对应的投票记录表是哪个，组装map，map格式为key是投票记录分表名，value是分表对应的投票id集合
      * @param typeId
      * @return
      */
-    private Map<String,List<Long>> getRecordMap(Integer typeId){
+    private Map<String,List<Long>> getRecordMap(){
     	Map<String,List<Long>> map = null;
     	int currentPage = 1;
     	int onePageSize = 100;
-		VoteTypeCdn condition = new VoteTypeCdn();
-		condition.setCurrentPage(currentPage);
-		condition.setOnePageSize(onePageSize);
-		condition.setTypeId(typeId);
-		condition.setStatus(Vote_Status.normal);
-		PageInfo<Vote> pageinfo = voteService.typeList(condition);
+		VoteCdtn condition = new VoteCdtn();
+    	condition.setStatus(Vote_Status.normal);
+    	condition.setCurrentPage(currentPage);
+    	condition.setOnePageSize(onePageSize);
+    	PageInfo<Vote> pageinfo = voteService.list(condition);
 		List<Vote> voteList = pageinfo.getObjects();
 		if(voteList != null && !voteList.isEmpty()){
 			map = new HashMap<String,List<Long>>();
@@ -116,7 +101,7 @@ public class TypeRankJob {
 					}
 				}
 				condition.setCurrentPage(++currentPage);
-			    pageinfo = voteService.typeList(condition);
+			    pageinfo = voteService.list(condition);
 				voteList = pageinfo.getObjects();
 			}
 		}
@@ -128,7 +113,7 @@ public class TypeRankJob {
      * @param map
      * @param typeId
      */
-    private List<VoteResult> getVoteRank(Map<String,List<Long>> map,Integer typeId){
+    private List<VoteResult> getVoteRank(Map<String,List<Long>> map){
         final List<VoteResult> rankList = new LinkedList<VoteResult>();
     	//算出排行
 		if(!map.isEmpty()){
@@ -198,14 +183,14 @@ public class TypeRankJob {
      * @param rankedList
      * @param typeId
      */
-    private void sendToRedis(List<VoteResult> rankedList,Integer typeId){
+    private void sendToRedis(List<VoteResult> rankedList){
     	if(rankedList == null || rankedList.isEmpty())
     		return;
     	int index = 0;
     	boolean isSuccess = false;
         while(index < retryTime && !isSuccess){
         	try{
-        	    redisTemplate.opsForValue().getAndSet(RedisKey.TYPE_PREFIX + typeId, rankedList);
+        	    redisTemplate.opsForValue().getAndSet(RedisKey.VOTE_HOT_KEY,rankedList);
         	    isSuccess = true;
         	}catch(Exception e){
         		//日志
@@ -214,5 +199,4 @@ public class TypeRankJob {
         	}
         }
     }
-    
 }

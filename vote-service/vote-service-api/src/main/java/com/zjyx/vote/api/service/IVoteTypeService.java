@@ -10,4 +10,5 @@ public interface IVoteTypeService {
 	public ReturnData<Integer> save(String name);
 	
 	public ReturnData<List<VoteType>> selectAll();
+	
 }

@@ -1,7 +1,6 @@
 package com.zjyx.vote.impl.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,6 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.stereotype.Service;
 
 import com.zjyx.vote.api.model.condition.VoteCdtn;
-import com.zjyx.vote.api.model.condition.VoteRankListCdt;
 import com.zjyx.vote.api.model.condition.VoteTypeCdn;
 import com.zjyx.vote.api.model.constants.RedisKey;
 import com.zjyx.vote.api.model.enums.Vote_Status;
@@ -23,7 +21,6 @@ import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.api.service.IVoteService;
 import com.zjyx.vote.api.utils.VoteRecordUtils;
-import com.zjyx.vote.common.constants.VoteConstants;
 import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.BasePageCondition;
 import com.zjyx.vote.common.model.PageInfo;
@@ -85,59 +82,38 @@ public class VoteServiceImpl implements IVoteService{
 	@Override
 	public PageInfo<Vote> typeList(VoteTypeCdn condition) {
 		PageInfo<Vote> pageInfo = new PageInfo<Vote>();
-		if(condition == null || condition.getTypeId() < 1){
+		if(condition == null || condition.getTypeId() < 1 || condition.getTypeId() < 1){
 			pageInfo.setErrorType(Error_Type.PARAM_ERROR);
 			return pageInfo;
 		}
 		List<Long> voteIds = voteTypeRelateMapper.selectByTypeId(condition.getTypeId());
 		if(voteIds.size() > 0){
 			String sort = " order by update_time desc";
-			List<Vote> list = voteMapper.selectByIds(voteIds,sort);
+			List<Vote> list = voteMapper.selectByIds(voteIds,sort,condition.getStatus());
 			pageInfo.setPageInfo(condition ,voteIds.size(), list, null);
 		}
 		return pageInfo;
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public PageInfo<Vote> hotList(BasePageCondition condition){
-		PageInfo<Vote> pageInfo = new PageInfo<Vote>();
-		if(condition == null || condition.getCurrentPage() < 1 || condition.getOnePageSize() < 1){
-			pageInfo.setErrorType(Error_Type.PARAM_ERROR);
-			return pageInfo;
-		}
-		//设置入参数据
-		VoteRankListCdt cdt = new VoteRankListCdt();
-		cdt.setCurrentPage(condition.getCurrentPage());
-		cdt.setOnePageSize(condition.getOnePageSize());
-		cdt.setNeedTotalResults(condition.isNeedTotalResults());
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.MINUTE, 0 - VoteConstants.HOT_VOTE_TIME);
-		cdt.setBeginTime(c.getTime());
-		int count = 0;
-		List<Vote> voteSortList = null;
-		Map<Long,Long> extendMap = null;
-		if(condition.isNeedTotalResults()){
-			 count = voteRecordMapper.rankListCount(cdt);
-		}
-		List<VoteResult> list = voteRecordMapper.rankList(cdt);
-		//如果从记录表查出数据
-		if(list!=null && list.size()>0){
-			List<Long> voteIds = new ArrayList<Long>();
-			extendMap = new HashMap<Long,Long>();
-			for(VoteResult voteResult:list){
-				voteIds.add(voteResult.getId());
-			}
-			List<Vote> voteList = voteMapper.selectByIds(voteIds, null);
-			Map<Long,Vote> map = Vote.listToMap(voteList);
-			voteSortList = new ArrayList<Vote>();
-			for(VoteResult voteResult:list){
-				voteSortList.add(map.get(voteResult.getId()));
-				extendMap.put(voteResult.getId(), Long.valueOf(voteResult.getCount()));
-			}
-		}
-		pageInfo.setPageInfo(condition ,count, voteSortList, list);
-		return pageInfo;
+	public List<Vote> hotList(){
+		List<Vote> sortList = null;
+		List<VoteResult> list = (List<VoteResult>) redisTemplate.opsForValue().get(RedisKey.VOTE_HOT_KEY);
+	    if(list!=null && !list.isEmpty()){
+	    	sortList = new ArrayList<Vote>();
+	    	List<Long> ids = new ArrayList<Long>();
+	    	for(VoteResult voteResult : list){
+	    		ids.add(voteResult.getId());
+	    	}
+	    	List<Vote> voteList = voteMapper.selectByIds(ids, null, null);
+	    	Map<Long,Vote> map = Vote.listToMap(voteList);
+	    	for(VoteResult voteResult : list){
+	    		sortList.add(map.get(voteResult.getId()));
+	    	}
+	    }
+	    return sortList;
 	}
 	
 	@Override
@@ -153,7 +129,6 @@ public class VoteServiceImpl implements IVoteService{
 		int onePageSize = condition.getOnePageSize();
 		String redisKey = RedisKey.VOTE_RANK_KEY;
 		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(redisKey, 0, -1, beginNum, onePageSize);
-//		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeWithScores(redisKey, beginNum, onePageSize);
 		if(condition.isNeedTotalResults()){
 	    	totalCount = redisTemplate.opsForZSet().zCard(redisKey).intValue();
 	    }
@@ -164,7 +139,7 @@ public class VoteServiceImpl implements IVoteService{
 			voteIds.add(voteId);
 	    }
 	    //获取id对应的投票列表
-	    List<Vote> voteList = voteMapper.selectByIds(voteIds, null);
+	    List<Vote> voteList = voteMapper.selectByIds(voteIds, null,null);
 	    Map<Long,Vote> map = Vote.listToMap(voteList);
 	    //投票id，投票数量映射map
 	    Map<Long,Long> extendMap = new HashMap<Long,Long>();
@@ -213,62 +188,36 @@ public class VoteServiceImpl implements IVoteService{
 		returnData.setResultData(vote);
 		return returnData;
 	}
-	
-//	private PageInfo<Vote> rankList(BasePageCondition condition,boolean isNeedBeginTime) {
-//		PageInfo<Vote> pageInfo = new PageInfo<Vote>();
-//		if(condition == null || condition.getCurrentPage() < 1 || condition.getOnePageSize() < 1){
-//			pageInfo.setErrorType(Error_Type.PARAM_ERROR);
-//			return pageInfo;
-//		}
-//		//初始化数据
-//		VoteRankListCdt condtion = new VoteRankListCdt();
-//		condtion.setBeginNum(condition.getBeginNum());
-//		condtion.setCurrentPage(condition.getCurrentPage());
-//		condtion.setNeedTotalResults(condition.isNeedTotalResults());
-//		condtion.setOnePageSize(condition.getOnePageSize());
-//		int totalCount = 0;
-//		int beginNum = condition.getBeginNum();
-//		Collection<Object> list = new ArrayList<Object>();
-//		//获取要查找的id列表
-//		for(int i = beginNum;i<beginNum+condition.getOnePageSize();i++){
-//			list.add(i);
-//		}
-//		String redisKey = null;
-//		if(isNeedBeginTime){
-//			//热投
-//			redisKey = RedisKey.VOTE_HOT_KEY;
-//			Calendar c = Calendar.getInstance();
-//			c.set(Calendar.MINUTE, 0 - VoteConstants.HOT_VOTE_TIME);
-//			condtion.setBeginTime(c.getTime());
-//		}else{
-//			//榜单投
-//			redisKey = RedisKey.VOTE_RANK_KEY;
-//			condtion.setBeginTime(null);
-//		}
-//		List<Object> voteRankList = redisTemplate.opsForHash().multiGet(redisKey, list);
-//		if(condition.isNeedTotalResults()){
-//	    	totalCount = redisTemplate.opsForHash().size(redisKey).intValue();
-//	    }
-//		List<Long> voteIds = new ArrayList<Long>();
-//		//获取投票id
-//	    for(Object obj:voteRankList){
-//	    	RankVote rv = (RankVote) obj;
-//	    	voteIds.add(rv.getVote_id());
-//	    }
-//	    //获取id对应的投票列表
-//	    List<Vote> voteList = voteMapper.selectByIds(voteIds, null);
-//	    Map<Long,Vote> map = Vote.listToMap(voteList);
-//	    //投票id，投票数量映射map
-//	    Map<Long,Long> extendMap = new HashMap<Long,Long>();
-//	    voteList = new ArrayList<Vote>();
-//	    for(Object obj:voteRankList){
-//	    	RankVote rv = (RankVote) obj;
-//	    	Vote vote= map.get(rv.getVote_id());
-//	    	voteList.add(vote);
-//	    	extendMap.put(rv.getVote_id(), rv.getVote_count());
-//	    }
-//	    pageInfo.setPageInfo(condition ,totalCount, voteList,extendMap);
-//		return pageInfo;
-//	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public PageInfo<Vote> typeWithRankList(VoteTypeCdn  condition) {
+		PageInfo<Vote> pageinfo = new PageInfo<Vote>();
+		if(condition == null || !condition.isRightPageInfo() || condition.getTypeId() < 1){
+			pageinfo.setErrorType(Error_Type.PARAM_ERROR);
+			return pageinfo;
+		}
+		List<Vote> sortList = null;
+		//如果需要榜单排列，当第一页时是需要的
+		if(condition.getCurrentPage() == 1){
+			Object v = redisTemplate.opsForValue().get(RedisKey.TYPE_PREFIX + condition.getTypeId());
+			if(v != null){
+				List<VoteResult> voteResultList = (List<VoteResult>) v;
+		    	List<Long> ids = new ArrayList<Long>();
+		    	for(VoteResult voteResult : voteResultList){
+		    		ids.add(voteResult.getId());
+		    	}
+		    	List<Vote> voteList = voteMapper.selectByIds(ids, null, null);
+		    	Map<Long,Vote> map = Vote.listToMap(voteList);
+		    	sortList = new ArrayList<Vote>();
+		    	for(VoteResult voteResult : voteResultList){
+		    		sortList.add(map.get(voteResult.getId()));
+		    	}
+			}
+		}
+		pageinfo = typeList(condition);
+		pageinfo.setExtendInfo(sortList);
+		return pageinfo;
+	}
+	
 }

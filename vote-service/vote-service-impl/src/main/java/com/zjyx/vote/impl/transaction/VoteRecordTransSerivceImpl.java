@@ -46,7 +46,7 @@ public class VoteRecordTransSerivceImpl implements IVoteRecordTransSerivce{
 				iterator.remove();
 			voteIds.add(voteRecord.getVote_id());
 		}
-		List<Vote> votes = voteMapper.selectByIds(voteIds, null);
+		List<Vote> votes = voteMapper.selectByIds(voteIds, null, null);
 		List<VoteRecord> list1 = new ArrayList<VoteRecord>();
 		List<VoteRecord> list2 = new ArrayList<VoteRecord>();
 		List<VoteRecord> list3 = new ArrayList<VoteRecord>();
