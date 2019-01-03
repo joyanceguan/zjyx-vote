@@ -42,12 +42,22 @@
     </update>
   
     <select id="selectByVoteId" resultType="voteOption">
-        select vote_id, option_desc,vote_option_type, sort,create_time, update_time 
+        select id,vote_id, option_desc,vote_option_type, sort,create_time, update_time 
         from vote_option where vote_id=#{voteId}
     </select>
     
     <delete id="deleteById">
         delete from vote_option where id = #{id}
     </delete>
+    
+    <delete id="deleteByIds">
+        delete from vote_option where id in 
+          <foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+               #{item}  
+          </foreach>
+    </delete>
   
+   <delete id="deleteByVoteId">
+        delete from vote_option where vote_id = #{id}
+    </delete>
 </mapper>

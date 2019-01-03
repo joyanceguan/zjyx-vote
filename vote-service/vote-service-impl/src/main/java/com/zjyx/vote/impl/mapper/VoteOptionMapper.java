@@ -13,4 +13,8 @@ public interface VoteOptionMapper {
 	public List<VoteOption> selectByVoteId(Long voteId);
 	
 	public int deleteById(Long id);
+	
+	public int deleteByIds(List<Long> list);
+	
+	public int deleteByVoteId(Long id);
 }

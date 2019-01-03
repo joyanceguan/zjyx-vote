@@ -1,5 +1,6 @@
 package com.zjyx.vote.impl.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,8 +75,49 @@ public class VoteServiceImpl implements IVoteService{
 		vote.setId(id);
 		vote.setStatus(vote_Status);
 		int flag = voteMapper.update(vote);
+		//更新redis统计数据
+		updateRedis(id,vote_Status);
 		returnData.setResultData(flag);
 		return returnData;
+	}
+	
+	/**
+	 * 因已经将统计信息放入redis中，如果用户已经投票了下架的话，将统计信息改成负数，上架将负数改成正数，避免下架的投票在首页还能被用户看到
+	 * @param id
+	 * @param vote_Status
+	 */
+	private void updateRedis(Long id,Vote_Status vote_Status){
+		String redisKey = RedisKey.VOTE_RANK_KEY;
+		Double score = redisTemplate.opsForZSet().score(redisKey, id);
+		//如果存在该投票
+		if(score!=null){
+			BigDecimal scoreBigDecimal = new BigDecimal(""+score);
+			//如果是关闭
+			if(vote_Status == Vote_Status.close){
+				if(scoreBigDecimal.compareTo(BigDecimal.ZERO) == 0){
+					//如果是0，下架就删除
+					redisTemplate.opsForZSet().remove(redisKey, id);
+				}else if(scoreBigDecimal.compareTo(BigDecimal.ZERO) > 0){
+					//如果是已经有投票了，那么将其变成负数
+					BigDecimal increment = BigDecimal.ZERO.subtract(scoreBigDecimal.multiply(new BigDecimal(2)));
+					redisTemplate.opsForZSet().incrementScore(redisKey, id, increment.doubleValue());
+				}else{
+					//已经是负数，不需要改了
+				}
+			}
+			//如果是开启
+			else if(vote_Status == Vote_Status.normal){
+				if(scoreBigDecimal.compareTo(BigDecimal.ZERO) >= 0){
+					//什么都不干
+				}else{
+					//如果是负数，恢复成正数
+					BigDecimal increment = BigDecimal.ZERO.add(scoreBigDecimal.multiply(new BigDecimal(2)));
+					redisTemplate.opsForZSet().incrementScore(redisKey, id, increment.doubleValue());
+				}
+			}
+		}else{
+			redisTemplate.opsForZSet().add(redisKey, id, 0);
+		}
 	}
 
 
@@ -99,10 +141,10 @@ public class VoteServiceImpl implements IVoteService{
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Vote> hotList(){
-		List<Vote> sortList = null;
+		List<Vote> resultList = null;
 		List<VoteResult> list = (List<VoteResult>) redisTemplate.opsForValue().get(RedisKey.VOTE_HOT_KEY);
 	    if(list!=null && !list.isEmpty()){
-	    	sortList = new ArrayList<Vote>();
+	    	resultList = new ArrayList<Vote>();
 	    	List<Long> ids = new ArrayList<Long>();
 	    	for(VoteResult voteResult : list){
 	    		ids.add(voteResult.getId());
@@ -110,10 +152,17 @@ public class VoteServiceImpl implements IVoteService{
 	    	List<Vote> voteList = voteMapper.selectByIds(ids, null, null);
 	    	Map<Long,Vote> map = Vote.listToMap(voteList);
 	    	for(VoteResult voteResult : list){
-	    		sortList.add(map.get(voteResult.getId()));
+	    		resultList.add(map.get(voteResult.getId()));
 	    	}
+	    } else{
+	    	//还没人投票呢,那么先默认按修改时间倒序排列
+	    	int rank = 100;
+	    	VoteCdtn voteCdtn = new VoteCdtn();
+	    	voteCdtn.setStatus(Vote_Status.normal);
+	    	voteCdtn.setOnePageSize(rank);
+	    	resultList = voteMapper.list(voteCdtn);
 	    }
-	    return sortList;
+	    return resultList;
 	}
 	
 	@Override
@@ -128,34 +177,36 @@ public class VoteServiceImpl implements IVoteService{
 		int beginNum = condition.getBeginNum();
 		int onePageSize = condition.getOnePageSize();
 		String redisKey = RedisKey.VOTE_RANK_KEY;
-		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(redisKey, 0, -1, beginNum, onePageSize);
-		if(condition.isNeedTotalResults()){
-	    	totalCount = redisTemplate.opsForZSet().zCard(redisKey).intValue();
-	    }
+		Set<TypedTuple<Object>> values = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(redisKey, 0, Integer.MAX_VALUE, beginNum, onePageSize);
+		totalCount = redisTemplate.opsForZSet().zCard(redisKey).intValue();
 		List<Long> voteIds = new ArrayList<Long>();
 		//获取投票id
 		for(TypedTuple<Object> type:values){
 			Long voteId = (Long) type.getValue();
 			voteIds.add(voteId);
 	    }
-	    //获取id对应的投票列表
-	    List<Vote> voteList = voteMapper.selectByIds(voteIds, null,null);
-	    Map<Long,Vote> map = Vote.listToMap(voteList);
-	    //投票id，投票数量映射map
-	    Map<Long,Long> extendMap = new HashMap<Long,Long>();
-	    voteList = new ArrayList<Vote>();
-	    for(TypedTuple<Object> type:values){
-	    	Long voteId = (Long) type.getValue();
-	    	Vote vote= map.get(voteId);
-	    	voteList.add(vote);
-	    	extendMap.put(voteId,type.getScore().longValue());
-	    }
-	    pageInfo.setPageInfo(condition ,totalCount, voteList, extendMap);
+		List<Vote> voteList = null;
+		Map<Long,Long> extendMap = null;
+		if(!voteIds.isEmpty()){
+			//获取id对应的投票列表
+		    voteList = voteMapper.selectByIds(voteIds, null,null);
+		    Map<Long,Vote> map = Vote.listToMap(voteList);
+		    //投票id，投票数量映射map
+		    extendMap = new HashMap<Long,Long>();
+		    voteList = new ArrayList<Vote>();
+		    for(TypedTuple<Object> type:values){
+		    	Long voteId = (Long) type.getValue();
+		    	Vote vote= map.get(voteId);
+		    	voteList.add(vote);
+		    	extendMap.put(voteId,type.getScore().longValue());
+		    }
+		}
+		pageInfo.setPageInfo(condition ,totalCount, voteList, extendMap);
 		return pageInfo;
 	}
 
 	@Override
-	public ReturnData<Vote> randomList(Long userId) {
+	public ReturnData<Vote> random(Long userId) {
 		ReturnData<Vote> returnData = new ReturnData<Vote>();
 		//用户必须登录才行
 		if(userId == null){
