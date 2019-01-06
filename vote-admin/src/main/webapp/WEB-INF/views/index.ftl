@@ -43,8 +43,8 @@
                             <li><a href="javascript:;" date-src="/helloworld?page=info-det">领导值岗管理</a></li>
                             <li><a href="javascript:;">中层领导管理</a></li>
                             <li><a href="javascript:;">领导值班记录</a></li>
-                            <li><a href="javascript:;" date-src="/admin/vote">投票录入</a></li>
                             <li><a href="javascript:;" date-src="/admin/voteList">投票列表</a></li>
+                            <li><a href="javascript:;" date-src="/admin/voteTypeList">投票类型</a></li>
                         </ul>
                     </li>
                     <li class="system">

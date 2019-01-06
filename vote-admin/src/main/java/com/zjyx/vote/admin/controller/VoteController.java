@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSON;
 import com.zjyx.vote.admin.param.VoteParam;
 import com.zjyx.vote.admin.viewmodel.BaseVM;
 import com.zjyx.vote.api.model.condition.VoteCdtn;
@@ -24,7 +23,9 @@ import com.zjyx.vote.api.model.enums.Vote_Option_Type;
 import com.zjyx.vote.api.model.enums.Vote_Status;
 import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.api.model.persistence.VoteOption;
+import com.zjyx.vote.api.model.persistence.VoteType;
 import com.zjyx.vote.api.service.IVoteService;
+import com.zjyx.vote.api.service.IVoteTypeService;
 import com.zjyx.vote.api.transaction.IVoteTransService;
 import com.zjyx.vote.api.utils.VoteRuleUtils;
 import com.zjyx.vote.common.enums.Error_Type;
@@ -40,6 +41,9 @@ public class VoteController {
 	
 	@Resource
 	IVoteService voteService; 
+	
+	@Resource
+	IVoteTypeService voteTypeService;
 	
 	@RequestMapping("/voteList")
 	public ModelAndView voteList(VoteCdtn voteCdtn){
@@ -60,11 +64,13 @@ public class VoteController {
 	
 	@RequestMapping("/vote")
 	public ModelAndView vote(Long id){
-		ModelAndView mv = new ModelAndView("views/info-add");
+		ModelAndView mv = new ModelAndView("views/vote_add");
 		if(id != null){
 			ReturnData<Vote> returnData = voteService.selectById(id);
 			mv.addObject("vote", returnData.getResultData());
 		}
+		ReturnData<List<VoteType>> returnData= voteTypeService.selectAll();
+		mv.addObject("voteTypes", returnData.getResultData());
 		mv.addObject("voteChooseTypes", Vote_Choose_Type.values());
 		mv.addObject("optionTypes", Vote_Option_Type.values());
 		return mv;
@@ -75,7 +81,6 @@ public class VoteController {
 	@RequestMapping("/saveVote")
 	@ResponseBody
 	public BaseVM saveVote(@RequestBody VoteParam voteParam){
-		System.out.println(JSON.toJSONString(voteParam));
 		BaseVM vm = new BaseVM();
 		VoteDto vote = voteParam.getVote();
 		List<VoteOption> options = voteParam.getOptions();
@@ -134,5 +139,12 @@ public class VoteController {
 		ReturnData<Vote> returnData= voteTransService.saveVote(vote, voteRule, options);
 		vm.setErrorInfo(returnData);
 		return vm;
+	}
+	
+	@RequestMapping("/deleteVote")
+	public ModelAndView delete(Long id){
+		ModelAndView mv = new ModelAndView("redirect:/admin/voteList");
+		voteService.deleteById(id);
+		return mv;
 	}
 }

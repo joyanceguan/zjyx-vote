@@ -121,8 +121,4 @@
                  #{item}  
           </foreach> 
 	 </select>
-	 
-	 <delete id="delelteById">
-	       delete from vote where id = #{id}
-	 </delete>
 </mapper>

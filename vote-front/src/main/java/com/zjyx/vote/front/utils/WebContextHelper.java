@@ -6,10 +6,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.zjyx.vote.api.model.persistence.UserLogin;
+import com.zjyx.vote.api.model.dto.UserLoginDto;
 import com.zjyx.vote.common.constants.VoteConstants;
-
-
 
 public class WebContextHelper {
 
@@ -27,23 +25,26 @@ public class WebContextHelper {
 		return getRequest().getSession().getAttribute(name);
 	}
 	
-	
 	public static void cleanSession(){
 		HttpSession session = getRequest().getSession();  
 		session.invalidate();  
 	}
 	
-	public static UserLogin getUser(){
-		UserLogin userLogin = (UserLogin) getSessionValue(VoteConstants.USER_SESSION);
-		return userLogin;
+	public static UserLoginDto getUser(){
+		UserLoginDto userLoginDto = (UserLoginDto) getSessionValue(VoteConstants.USER_SESSION);
+		return userLoginDto;
 	}
 	
 	public static boolean isLogin(){
-		return getSessionValue(VoteConstants.USER_SESSION)!=null;
+		return getUserId()!=null;
 	}
 	
 	public static Long getUserId(){
-		UserLogin userLogin = (UserLogin) getSessionValue(VoteConstants.USER_SESSION);
-		return userLogin == null ? null : userLogin.getId();
+		Long userId = null;
+		UserLoginDto userLoginDto = (UserLoginDto) getSessionValue(VoteConstants.USER_SESSION);
+		if(userLoginDto!=null && userLoginDto.getUserLogin()!=null){
+			userId = userLoginDto.getUserLogin().getId();
+		}
+		return userId;
 	}
 }

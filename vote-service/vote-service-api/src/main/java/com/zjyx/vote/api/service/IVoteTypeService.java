@@ -11,4 +11,6 @@ public interface IVoteTypeService {
 	
 	public ReturnData<List<VoteType>> selectAll();
 	
+	public ReturnData<Integer> deleteById(Long id);
+	
 }

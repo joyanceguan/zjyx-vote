@@ -15,5 +15,8 @@ public class VoteConstants {
 	public final static int HOT_VOTE_TIME = 24*60;
 	//发送redis失败重试的次数
 	public final static int RESEND_REDIS_TIME = 3;
-	
+	//热投显示前多少
+	public final static int HOT_RANK = 100;
+	//每个类型显示多少
+	public final static int TYPE_RANK = 10;
 }

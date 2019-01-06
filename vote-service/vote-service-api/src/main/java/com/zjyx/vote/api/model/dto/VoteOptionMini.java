@@ -4,6 +4,8 @@ import com.zjyx.vote.api.model.enums.Vote_Option_Type;
 
 public class VoteOptionMini {
 
+	//id
+	private Long id;
 	//选项
 	private String option;
 	//选项类型
@@ -28,6 +30,12 @@ public class VoteOptionMini {
 	}
 	public void setSort(int sort) {
 		this.sort = sort;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 }

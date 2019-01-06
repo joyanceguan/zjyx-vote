@@ -36,7 +36,7 @@ public class VoteTypeController {
 		return bv;
 	}
 	
-	@RequestMapping("/voteTypes")
+	@RequestMapping("/voteTypeList")
 	public ModelAndView voteTypes(){
 		ModelAndView mv = new ModelAndView("views/vote_type_list");
 		ReturnData<List<VoteType>> returnData = voteTypeService.selectAll();
@@ -45,4 +45,16 @@ public class VoteTypeController {
 		return mv;
 	}
 	
+	@RequestMapping("/voteType")
+	public ModelAndView voteType(){
+		ModelAndView mv = new ModelAndView("views/vote_type_add");
+		return mv;
+	}
+	
+	@RequestMapping("/deleteVoteType")
+	public ModelAndView deleteVoteType(Long id){
+		ModelAndView mv = new ModelAndView("redirect:/admin/voteTypeList");
+		voteTypeService.deleteById(id);
+		return mv;
+	}
 }

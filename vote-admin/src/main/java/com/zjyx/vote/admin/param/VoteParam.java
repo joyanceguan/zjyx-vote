@@ -15,6 +15,7 @@ public class VoteParam {
    
    private VoteRuleDto voteRule;
    
+   private List<Integer> types;
    
    public VoteDto getVote() {
 	  return vote;
@@ -38,6 +39,14 @@ public class VoteParam {
 
    public void setVoteRule(VoteRuleDto voteRule) {
 	  this.voteRule = voteRule;
+   }
+
+   public List<Integer> getTypes() {
+	  return types;
+   }
+
+   public void setTypes(List<Integer> types) {
+	  this.types = types;
    }
 
 }

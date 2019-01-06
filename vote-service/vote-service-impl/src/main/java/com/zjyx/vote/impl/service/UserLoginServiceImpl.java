@@ -8,7 +8,9 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import com.zjyx.vote.api.model.dto.UserLoginDto;
 import com.zjyx.vote.api.model.enums.User_Status;
+import com.zjyx.vote.api.model.persistence.User;
 import com.zjyx.vote.api.model.persistence.UserLogin;
 import com.zjyx.vote.api.service.IUserLoginService;
 import com.zjyx.vote.common.constants.ErrorCode;
@@ -19,6 +21,7 @@ import com.zjyx.vote.common.model.ReturnData;
 import com.zjyx.vote.common.utils.Md5Utils;
 import com.zjyx.vote.common.utils.RegexUtils;
 import com.zjyx.vote.impl.mapper.UserLoginMapper;
+import com.zjyx.vote.impl.mapper.UserMapper;
 
 
 @Service
@@ -29,6 +32,9 @@ public class UserLoginServiceImpl implements IUserLoginService{
 	
 	@Resource
 	ExecutorService syncExcutor;
+	
+	@Resource
+	UserMapper userMapper;
 
 	@Override
 	public ReturnData<Integer> updatePassword(Long id, String password) {
@@ -61,8 +67,8 @@ public class UserLoginServiceImpl implements IUserLoginService{
 	}
 
 	@Override
-	public ReturnData<UserLogin> login(String loginName,String password) {
-		ReturnData<UserLogin> returnData = new ReturnData<UserLogin>();
+	public ReturnData<UserLoginDto> login(String loginName,String password) {
+		ReturnData<UserLoginDto> returnData = new ReturnData<UserLoginDto>();
 		if(StringUtils.isBlank(loginName) || StringUtils.isBlank(password)){
 			returnData.setErrorType(Error_Type.PARAM_ERROR);
 		}else{
@@ -82,12 +88,16 @@ public class UserLoginServiceImpl implements IUserLoginService{
 					returnData.setErrorType(Error_Type.SERVICE_ERROR);
 					returnData.setErrorCode(ErrorCode.INVALID_PASSWD);
 				}else{
+					User user = userMapper.selectById(userLogin.getId());
 					User_Status status = userLogin.getStatus();
 					if(status == User_Status.freeze){
 						returnData.setErrorType(Error_Type.SERVICE_ERROR);
 						returnData.setErrorCode(ErrorCode.USER_FREEZE);
 					}
-					returnData.setResultData(userLogin);
+					UserLoginDto dto = new UserLoginDto();
+					dto.setUserLogin(userLogin);
+					dto.setUser(user);
+					returnData.setResultData(dto);
 					userLogin.setLast_login_time(new Date());
 					//异步修改最后登录时间
 					updateLoginTime(userLogin);

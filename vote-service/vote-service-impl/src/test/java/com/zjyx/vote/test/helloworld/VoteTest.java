@@ -1,7 +1,5 @@
 package com.zjyx.vote.test.helloworld;
 
-import java.util.Date;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,4 +23,5 @@ public class VoteTest {
 		Vote vote = mapper.selectById(1L);
 		System.out.println(JSON.toJSONString(vote));
 	}
+	
 }

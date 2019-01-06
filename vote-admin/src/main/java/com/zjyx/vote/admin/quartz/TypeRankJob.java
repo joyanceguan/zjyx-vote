@@ -29,6 +29,7 @@ import com.zjyx.vote.api.service.IVoteRecordService;
 import com.zjyx.vote.api.service.IVoteService;
 import com.zjyx.vote.api.service.IVoteTypeService;
 import com.zjyx.vote.api.utils.VoteRecordUtils;
+import com.zjyx.vote.common.constants.VoteConstants;
 import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.PageInfo;
 import com.zjyx.vote.common.model.ReturnData;
@@ -57,7 +58,7 @@ public class TypeRankJob {
 	RedisTemplate<String, Object> redisTemplate;
 	
 	//每个类型算出前多少
-	public final static int rank = 10;
+	public final static int rank = VoteConstants.TYPE_RANK;
 	
 	//统计多长时间内的排行(分钟为单位)
 	public final static int period = 60*24*365;
@@ -66,7 +67,7 @@ public class TypeRankJob {
 	public final static int retryTime = 3;
 	
 	//每1分钟执行一次同步redis
-    @Scheduled(cron = "* 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ?")
 	public void typeRank(){
     	ReturnData<List<VoteType>> returnData = voteTypeService.selectAll();
     	if(returnData.getErrorType() == Error_Type.SUCCESS){
@@ -131,7 +132,7 @@ public class TypeRankJob {
     private List<VoteResult> getVoteRank(Map<String,List<Long>> map,Integer typeId){
         final List<VoteResult> rankList = new LinkedList<VoteResult>();
     	//算出排行
-		if(!map.isEmpty()){
+		if(map!=null && !map.isEmpty()){
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.MINUTE, 0 - period);
 			int size = map.keySet().size();//记录表个数

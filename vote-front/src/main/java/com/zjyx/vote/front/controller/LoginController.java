@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zjyx.vote.api.model.persistence.UserLogin;
+import com.zjyx.vote.api.model.dto.UserLoginDto;
 import com.zjyx.vote.api.service.IUserLoginService;
 import com.zjyx.vote.common.constants.Regex;
 import com.zjyx.vote.common.constants.VoteConstants;
@@ -45,8 +45,8 @@ public class LoginController {
 			vm.setErrorMessage("请书写正确的邮箱");
 			return vm;
 		}
-		ReturnData<UserLogin> returnData = userLoginService.login(param.getEmail(), param.getPassword());
-		UserLogin userLogin = returnData.getResultData();
+		ReturnData<UserLoginDto> returnData = userLoginService.login(param.getEmail(), param.getPassword());
+		UserLoginDto userLogin = returnData.getResultData();
 		if(userLogin!=null){
 			WebContextHelper.setSessionValue(VoteConstants.USER_SESSION, userLogin);
 		}

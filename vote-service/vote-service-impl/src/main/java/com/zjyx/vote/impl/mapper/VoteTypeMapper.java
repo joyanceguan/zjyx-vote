@@ -10,4 +10,6 @@ public interface VoteTypeMapper {
 	
 	public List<VoteType> selectAll();
 	
+	public int deleteById(Long id);
+	
 }

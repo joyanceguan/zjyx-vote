@@ -1,4 +1,4 @@
-﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -136,10 +136,10 @@
 								<h3>榜单投</h3>
 							</div>
 						</div>
-						<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
+						<div class="col-md-5 col-sm-6 col-xs-2 text-center " id="random" style="width: 20%" id="random">
 								<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
 									<i class="tf-ios-alarm-outline"></i>
-									<h3>热投</h3>
+									<h3>随机投</h3>
 								</div>
 							</div>
 							<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
@@ -688,6 +688,10 @@
 		});
 		$("#ranklist").click(function(){
   			window.location.href = "/ranklist";
+		});
+		
+		$("#random").click(function(){
+  			window.location.href = "/random";
 		});
 	</script>
   </body>

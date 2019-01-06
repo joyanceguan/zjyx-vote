@@ -1,6 +1,7 @@
 package com.zjyx.vote.api.service;
 
 import com.zjyx.vote.api.model.condition.VoteRankListCdt;
+import com.zjyx.vote.api.model.persistence.User;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
 import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.common.model.PageInfo;
@@ -13,7 +14,7 @@ public interface IVoteRecordService {
 	 * @param voteRecord
 	 * @return
 	 */
-	public ReturnData<Integer> save(VoteRecord voteRecord);
+	public ReturnData<Integer> save(VoteRecord voteRecord,User user);
 	
     /**
      * 根据条件排行	

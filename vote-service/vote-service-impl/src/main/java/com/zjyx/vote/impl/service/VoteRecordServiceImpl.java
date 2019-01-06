@@ -1,5 +1,7 @@
 package com.zjyx.vote.impl.service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -10,16 +12,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.zjyx.vote.api.model.condition.VoteRankListCdt;
 import com.zjyx.vote.api.model.constants.RedisKey;
+import com.zjyx.vote.api.model.dto.VoteRuleDto;
+import com.zjyx.vote.api.model.persistence.User;
+import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
 import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.api.service.IVoteRecordService;
+import com.zjyx.vote.api.utils.VoteRecordUtils;
+import com.zjyx.vote.common.constants.ErrorCode;
 import com.zjyx.vote.common.constants.VoteConstants;
 import com.zjyx.vote.common.enums.Error_Type;
 import com.zjyx.vote.common.model.PageInfo;
 import com.zjyx.vote.common.model.ReturnData;
 import com.zjyx.vote.common.utils.UUIDUtils;
+import com.zjyx.vote.impl.mapper.VoteMapper;
 import com.zjyx.vote.impl.mapper.VoteRecordMapper;
 
 @Service
@@ -31,20 +40,115 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 	RedisTemplate<String, Object> redisTemplate;
 	
 	@Resource
+	VoteMapper voteMapper;
+	
+	@Resource
 	VoteRecordMapper voteRecordMapper;
 	
 	@Override
-	public ReturnData<Integer> save(VoteRecord voteRecord) {
+	public ReturnData<Integer> save(VoteRecord voteRecord,User user) {
 		ReturnData<Integer> returnData = verfiySave(voteRecord);
+		//参数校验
+		if(returnData.getErrorType()!=Error_Type.SUCCESS){
+			return returnData;
+		}
+		//投票规则校验
+		returnData = isCanVote(voteRecord,user);
 		if(returnData.getErrorType()!=Error_Type.SUCCESS){
 			return returnData;
 		}
 		voteRecord.setId(UUIDUtils.getUUId());
-		//发送redis
-		sendRecordToRedis(voteRecord);
+		//发送redis 之后优化时做
+//		sendRecordToRedis(voteRecord); 
+		int flag = voteRecordMapper.save(voteRecord);
 		//更新统计redis
 		sendCountToRedis(voteRecord);
+		returnData.setResultData(flag);
 		return returnData;
+	}
+	
+	private ReturnData<Integer> isCanVote(VoteRecord voteRecord,User user){
+		ReturnData<Integer> returnData = new ReturnData<Integer>();
+		Long vote_id = voteRecord.getVote_id();
+		Long user_id = voteRecord.getUser_id();
+		Vote vote = voteMapper.selectById(vote_id);
+		String limitRule = vote.getLimit_rule();
+		VoteRuleDto voteRuleDto = JSON.parseObject(limitRule, VoteRuleDto.class);
+		//登录限制
+		if(voteRuleDto.isLoginLimit() || user == null){
+			if(voteRecord.getUser_id() == null){
+				returnData.setErrorInfo(Error_Type.SERVICE_ERROR, ErrorCode.RULE_LIMIT, "登录限制");
+			    return returnData;
+			}
+			String table_name = VoteRecordUtils.getRecordTableName(vote);
+			List<VoteRecord> recordList = voteRecordMapper.getByVoteIdUserId(vote_id,user_id,table_name);
+			//投票次数限制
+			if(voteRuleDto.isEveryoneTotalLimit()){
+				int everyoneCount = voteRuleDto.getEveryoneCount();
+				int totalVoteCount = recordList == null ? 0 : recordList.size();
+				if(everyoneCount <= totalVoteCount){
+					//已经最高次数
+					returnData.setErrorInfo(Error_Type.SERVICE_ERROR, ErrorCode.RULE_LIMIT, "已达投票次数上限");
+				    return returnData;
+				}
+			}
+			//投票频率限制(算法有点晦涩难懂)
+			if(voteRuleDto.isEveryoneRateLimit()){
+				int everyoneRateCount = voteRuleDto.getEveryoneRateCount();
+				int everyoneTime = voteRuleDto.getEveryoneTime();
+				if(recordList!=null && recordList.size() > 0){
+					Date now = new Date();
+					Calendar c = Calendar.getInstance();
+					VoteRecord v = recordList.get(0);
+					c.setTime(v.getCreate_time());
+					//获取时间最早的这条投票记录
+					do {
+						v = getFirst(recordList,c.getTime());
+						if(v != null){
+							c.setTime(v.getCreate_time());
+							c.add(Calendar.MINUTE, everyoneTime);
+						}else{
+							break;
+						}
+					} while(c.getTime().compareTo(now) < 0);
+					
+					if(v!=null){
+						int count = getSize(recordList,v.getCreate_time());
+						if(count >= everyoneRateCount){
+							returnData.setErrorInfo(Error_Type.SERVICE_ERROR, ErrorCode.RULE_LIMIT, "已达投票频率上限");
+							return returnData;
+						}
+					}
+			    }
+		    }
+			voteRecord.setAge(user.getAge());
+			voteRecord.setSex(user.getSex());
+		}else{
+			//非登录限制
+	    }
+		return returnData;
+	}
+	
+	private VoteRecord getFirst(List<VoteRecord> recordList,Date time){
+		VoteRecord voteRecord = null;
+		for(int i=0;i<recordList.size();i++){
+			VoteRecord record = recordList.get(i);
+		    if(record.getCreate_time().compareTo(time) >= 0){
+		    	voteRecord = record;
+		    	break;
+		    }
+		}
+		return voteRecord;
+	}
+	
+	private int getSize(List<VoteRecord> recordList,Date time){
+		for(int i=0;i<recordList.size();i++){
+			VoteRecord record = recordList.get(i);
+		    if(record.getCreate_time().compareTo(time) >= 0){
+		    	return recordList.size() - i;
+		    }
+		}
+		return 0;
 	}
 	
 	private ReturnData<Integer> verfiySave(VoteRecord voteRecord){
@@ -165,6 +269,7 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 		pageinfo.setPageInfo(condition ,Long.valueOf(count), list, null);
 		return pageinfo;
 	}
+	
 }
 
 

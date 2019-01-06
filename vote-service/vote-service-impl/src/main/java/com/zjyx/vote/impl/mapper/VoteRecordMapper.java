@@ -12,9 +12,13 @@ public interface VoteRecordMapper {
 
 	public int batchSave(List<VoteRecord> list);
 	
+	public int save(VoteRecord voteRecord);
+	
 	public List<VoteResult> rankList(VoteRankListCdt condtion);
 	
 	public int rankListCount(VoteRankListCdt condtion);
 	
 	public List<Long> getVoteIdByUser(@Param("table_name") String tableName,@Param("user_id")Long userId);
+	
+	public List<VoteRecord> getByVoteIdUserId(@Param("vote_id") Long vote_id,@Param("user_id")Long userId,@Param("table_name") String tableName);
 }

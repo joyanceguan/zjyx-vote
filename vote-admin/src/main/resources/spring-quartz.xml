@@ -16,9 +16,10 @@
                         http://www.springframework.org/schema/mvc    
                         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">  
                         
-    <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>  
-    <task:scheduler id="qbScheduler" pool-size="10"/>
-      
+    
+    <task:annotation-driven/>    
+    <context:component-scan base-package="com.zjyx" />    
+        
     <!-- 类型排行榜线程池 -->    
     <bean id="typeRankExecutor" class="java.util.concurrent.Executors" factory-method="newFixedThreadPool" destroy-method="shutdown">
 		<constructor-arg value="10" />

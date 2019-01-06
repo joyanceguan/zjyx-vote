@@ -45,14 +45,14 @@
     <p class="short-input ue-clear">
     	<label>投票频率：</label>
         <input type="text" placeholder="时间（分钟）" style="width: 104px; margin-right: 10px;" id="everyone_time" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.everyoneTime!=0>${vote.voteRule.everyoneTime}</#if>"/>
-        <input type="text" placeholder="次数" style="width: 104px;" id="everyone_rate_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.everyoneRateCount!=0>vote.voteRule.everyoneRateCount</#if>"/>
+        <input type="text" placeholder="次数" style="width: 104px;" id="everyone_rate_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.everyoneRateCount!=0>${vote.voteRule.everyoneRateCount}</#if>"/>
         <span>时间以分钟为单位，例如每天一次 60*24 1</span>
     </p>
     </div>
     <div id="ipLimit" <#if vote.voteRule.loginLimit ?? && vote.voteRule.loginLimit == false><#else>style="display:none"</#if>>
     <p class="short-input ue-clear">
 	    <label>ip限投：</label>
-        <input type="text" placeholder="ip限投次数" id="ip_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.ipCount!=0>vote.voteRule.ipCount</#if>"/>
+        <input type="text" placeholder="ip限投次数" id="ip_count" onkeyup="this.value=this.value.replace(/\D/g,'')" value="<#if vote.voteRule.ipCount!=0>${vote.voteRule.ipCount}</#if>"/>
         <span>次数 当投票不限制登录时可用</span>
     </p> 
     <p class="short-input ue-clear">
@@ -91,6 +91,12 @@
     	</#if>
 	    </div>
     </div>
+    <p class="short-input ue-clear">
+      <label>类型：</label>
+      <#list voteTypes as type>
+        <span><input type="checkbox" name="types" value="${type.id}">${type.type_name}&nbsp;&nbsp;</span>
+      </#list>
+    </p>
     <p class="short-input ue-clear">
     	<label>投票说明：</label>
         <textarea placeholder="请输入内容（限制300字）" id="vote_explain">${(vote.vote_explain)!''}</textarea>
@@ -161,6 +167,8 @@ $(".confirm").click(function(){
 	var ip_time = $("#ip_time").val();
 	var ip_rate_count = $("#ip_rate_count").val();
 	var vote_explain = $("#vote_explain").val();
+	var types =  $("input[name='types']:checked");
+	var typeList = new Array();
 	
 	var everyoneTotalLimit = false;
 	var everyoneRateLimit = false;
@@ -170,6 +178,14 @@ $(".confirm").click(function(){
 	if(title == null || title == '' || title.length > 300){
 		alert('标题不能为空');
 		return;
+	}
+	if(types == null || types.length == 0){
+		alert('请选择至少一个类型');
+		return;
+	}else{
+		 for(var i=0;i<types.length;i++){
+			 typeList.push(parseInt($(types[i]).val()));
+		 }
 	}
 	
 	if(isLoginLimit == 'true'){
@@ -231,6 +247,7 @@ $(".confirm").click(function(){
 		optionArray.push(voteOptions);
 	}
 	param.options = optionArray;
+	param.types = typeList;
 	
 	if(isLoginLimit == 'true' || ipTotalLimit || ipRateLimit){
 		var voteRule = {};

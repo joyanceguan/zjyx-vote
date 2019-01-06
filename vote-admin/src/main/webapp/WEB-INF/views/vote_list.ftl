@@ -69,6 +69,7 @@
                 <td class="operate">
                    <a href="/admin/vote?id=${vote.id}">查看</a>
                    <a href="/admin/updatevotestatus?id=${vote.id}&status=<#if vote.status == 'normal'>close<#else>normal</#if>"><#if vote.status == 'normal'>下架<#else>上架</#if></a>
+                   <a href="/admin/deleteVote?id=${vote.id}">删除</a>
                 </td>
             </tr>
             </#list>

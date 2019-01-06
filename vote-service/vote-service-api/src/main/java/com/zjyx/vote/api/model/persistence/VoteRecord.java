@@ -3,6 +3,7 @@ package com.zjyx.vote.api.model.persistence;
 import java.util.Date;
 
 import com.zjyx.vote.api.model.enums.See_Type;
+import com.zjyx.vote.api.model.enums.Sex;
 
 public class VoteRecord {
 
@@ -25,6 +26,12 @@ public class VoteRecord {
 	private Date create_time;
 	//表名(非数据库字段名)
 	private String table_name;
+	
+	//=======================以下是做统计的用户冗余字段=======================
+	//性别
+	private Sex sex;
+	//年龄
+	private int age;
 	
 	public String getId() {
 		return id;
@@ -85,6 +92,18 @@ public class VoteRecord {
 	}
 	public void setTable_name(String table_name) {
 		this.table_name = table_name;
+	}
+	public Sex getSex() {
+		return sex;
+	}
+	public void setSex(Sex sex) {
+		this.sex = sex;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
 	}
 	
 }

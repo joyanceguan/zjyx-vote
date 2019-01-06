@@ -41,4 +41,17 @@ public class VoteTypeServiceImpl implements IVoteTypeService{
 		return returnData;
 	}
 
+	@Override
+	public ReturnData<Integer> deleteById(Long id) {
+		ReturnData<Integer> returnData = new ReturnData<Integer>();
+		if(id == null){
+			returnData.setErrorType(Error_Type.PARAM_ERROR);
+			return returnData;
+		}
+		//TODO JOY 需要校验是否能删除
+		int flag = voteTypeMapper.deleteById(id);
+		returnData.setResultData(flag);
+		return returnData;
+	}
+
 }

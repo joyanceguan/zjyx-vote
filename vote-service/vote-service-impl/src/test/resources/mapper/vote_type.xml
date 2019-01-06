@@ -17,7 +17,4 @@
        select id,type_name from vote_type
     </select>
   
-    <delete id="deleteById">
-       delete from vote_type where id = #{id}
-    </delete>
 </mapper>

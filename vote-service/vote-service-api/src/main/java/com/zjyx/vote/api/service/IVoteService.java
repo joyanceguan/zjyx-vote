@@ -18,6 +18,8 @@ public interface IVoteService {
 	
 	public ReturnData<Integer> updateStatus(Long id,Vote_Status vote_Status);
 	
+	public ReturnData<Integer> deleteById(Long id);
+	
 	//分类
 	public PageInfo<Vote> typeList(VoteTypeCdn condition);
 	
@@ -28,7 +30,7 @@ public interface IVoteService {
 	public PageInfo<Vote> rankList(BasePageCondition condition);
 	
 	//随机投
-	public ReturnData<Vote> randomList(Long userId);
+	public ReturnData<Vote> random(Long userId);
 	
 	//分类投
 	public PageInfo<Vote> typeWithRankList(VoteTypeCdn condition);

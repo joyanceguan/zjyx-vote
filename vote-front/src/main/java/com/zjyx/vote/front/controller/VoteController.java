@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.zjyx.vote.api.model.persistence.User;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
 import com.zjyx.vote.api.service.IVoteRecordService;
 import com.zjyx.vote.common.enums.Error_Type;
@@ -58,7 +59,11 @@ public class VoteController {
 		voteRecord.setCreate_time(new Date());
 		voteRecord.setIp(IPUtils.getIpAddr(request));
 		voteRecord.setUser_id(WebContextHelper.getUserId());
-		voteRecordService.save(voteRecord);
+		User user = null;
+		if(WebContextHelper.getUser()!=null){
+			user = WebContextHelper.getUser().getUser();
+		}
+		voteRecordService.save(voteRecord,user);
 		return baseVM;
 	}
 }

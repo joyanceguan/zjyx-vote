@@ -68,7 +68,7 @@
 							  alert('该用户已被冻结');
 						  }
 					   } else{
-						   window.location.href = contextPath+'/registe';
+						   window.location.href = contextPath+'/index';
 					   }
 				   }
 	            }, 

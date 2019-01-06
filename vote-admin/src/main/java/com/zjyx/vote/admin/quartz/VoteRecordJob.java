@@ -19,7 +19,7 @@ import com.zjyx.vote.common.model.ReturnData;
 /**
  * 从redis队列中获取投票记录，批量保存到数据库中
  */
-@Component
+//@Component
 public class VoteRecordJob {
 	
 	private static final Logger errorLog = LoggerFactory.getLogger("errorLog");
@@ -34,7 +34,7 @@ public class VoteRecordJob {
 	IVoteRecordTransSerivce voteRecordTransSerivce;
 	
 	//每10s执行一次同步数据库
-	@Scheduled(cron = "0/10 * * * * ? ")
+//	@Scheduled(cron = "0/10 * * * * ? ")
 	public void saveVoteRecord(){
 		Set<VoteRecord> set = redisTemplate.opsForSet().members(RedisKey.VOTERECORD_SAVE_KEY);
 		if(set.size() > 0){

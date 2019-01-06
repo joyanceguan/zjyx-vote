@@ -27,6 +27,7 @@ import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.api.service.IVoteRecordService;
 import com.zjyx.vote.api.service.IVoteService;
 import com.zjyx.vote.api.utils.VoteRecordUtils;
+import com.zjyx.vote.common.constants.VoteConstants;
 import com.zjyx.vote.common.model.PageInfo;
 
 /**
@@ -38,7 +39,7 @@ public class VoteHotJob {
 	private static final Logger errorLog = LoggerFactory.getLogger("errorLog");
 	
 	//每个类型算出前多少
-	public final static int rank = 100;
+	public final static int rank = VoteConstants.HOT_RANK;
 		
 	//统计多长时间内的排行(分钟为单位)
 	public final static int period = 60*24*365;
@@ -59,7 +60,7 @@ public class VoteHotJob {
 	RedisTemplate<String, Object> redisTemplate;
 	
 	//每1分钟执行一次同步redis
-    @Scheduled(cron = "* 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ?")
 	public void voteHot(){
     	//投票id和投票记录表对对号入座
     	Map<String,List<Long>> map = getRecordMap();

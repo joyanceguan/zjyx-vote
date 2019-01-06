@@ -116,6 +116,7 @@ public class VoteServiceImpl implements IVoteService{
 				}
 			}
 		}else{
+			//没有这个投票id的统计，则新增key，设置投票数为0
 			redisTemplate.opsForZSet().add(redisKey, id, 0);
 		}
 	}
@@ -269,6 +270,19 @@ public class VoteServiceImpl implements IVoteService{
 		pageinfo = typeList(condition);
 		pageinfo.setExtendInfo(sortList);
 		return pageinfo;
+	}
+
+	@Override
+	public ReturnData<Integer> deleteById(Long id) {
+		ReturnData<Integer> returnData = new ReturnData<Integer>();
+		if(id == null){
+			returnData.setErrorType(Error_Type.PARAM_ERROR);
+			return returnData;
+		}
+		//TODO JOY 删除需要判断是否有投票和统计数据
+		int flag = voteMapper.delelteById(id);
+		returnData.setResultData(flag);
+		return returnData;
 	}
 	
 }
