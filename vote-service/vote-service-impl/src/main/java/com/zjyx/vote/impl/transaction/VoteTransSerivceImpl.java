@@ -20,6 +20,7 @@ import com.zjyx.vote.api.model.enums.Vote_Option_Type;
 import com.zjyx.vote.api.model.enums.Vote_Status;
 import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.api.model.persistence.VoteOption;
+import com.zjyx.vote.api.model.persistence.VoteTypeRelate;
 import com.zjyx.vote.api.transaction.IVoteTransService;
 import com.zjyx.vote.api.utils.VoteRuleUtils;
 import com.zjyx.vote.common.enums.Error_Type;
@@ -27,6 +28,7 @@ import com.zjyx.vote.common.exceptions.TransactionException;
 import com.zjyx.vote.common.model.ReturnData;
 import com.zjyx.vote.impl.mapper.VoteMapper;
 import com.zjyx.vote.impl.mapper.VoteOptionMapper;
+import com.zjyx.vote.impl.mapper.VoteTypeRelateMapper;
 
 @Service
 public class VoteTransSerivceImpl implements IVoteTransService{
@@ -36,10 +38,13 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 	
 	@Resource
 	VoteOptionMapper voteOptionMapper;
+	
+	@Resource
+	VoteTypeRelateMapper voteTypeRelateMapper;
 
 	@Transactional("votetm")
 	@Override
-	public ReturnData<Vote> saveVote(VoteDto voteDto, VoteRuleDto voteRule, List<VoteOption> voteOptions) {
+	public ReturnData<Vote> saveVote(VoteDto voteDto, VoteRuleDto voteRule, List<VoteOption> voteOptions,List<Integer> types) {
 		ReturnData<Vote> returnData = new ReturnData<Vote>();
 		if(voteDto == null || voteOptions == null || voteOptions.isEmpty()){
 			throw new TransactionException(Error_Type.PARAM_ERROR,null,null);
@@ -105,13 +110,15 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 		if(voteDto.getVoteId() == null){
 			vote.setOption_mini("null");//下面会修改
 			flag = voteMapper.save(vote);
+			if(flag < 1){
+				throw new TransactionException(Error_Type.SYSTEM_ERROR,null,"保存投票失败");
+			}
 		}else{
 			vote.setId(voteDto.getVoteId());
 			//删除所有投票选项
 			flag = voteOptionMapper.deleteByVoteId(voteDto.getVoteId());
-		}
-		if(flag < 1){
-			throw new TransactionException(Error_Type.SYSTEM_ERROR,null,"保存投票失败");
+			//删除所有关联类型
+			flag = voteTypeRelateMapper.deleteByVoteId(voteDto.getVoteId());
 		}
 		for(VoteOption voteOption : voteOptions){
 			voteOption.setVote_id(vote.getId());
@@ -141,6 +148,19 @@ public class VoteTransSerivceImpl implements IVoteTransService{
 		flag = voteMapper.update(vote);
 		if(flag < 1){
 			throw new TransactionException(Error_Type.SYSTEM_ERROR,null,"修改投票失败");
+		}
+		//插入类型投票关联表
+		//类型关联
+        List<VoteTypeRelate> typeRelateList = new ArrayList<VoteTypeRelate>();
+        for(Integer type:types){
+        	VoteTypeRelate voteTypeRelate = new VoteTypeRelate();
+        	voteTypeRelate.setType_id(type);
+        	voteTypeRelate.setVote_id(vote.getId());
+        	typeRelateList.add(voteTypeRelate);
+        }
+		flag = voteTypeRelateMapper.batchSave(typeRelateList);
+		if(flag != types.size()){
+			throw new TransactionException(Error_Type.SYSTEM_ERROR,null,"投票类型关联失败");
 		}
 		returnData.setResultData(vote);
 		return returnData;

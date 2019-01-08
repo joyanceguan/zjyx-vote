@@ -1,8 +1,11 @@
 package com.zjyx.vote.admin.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.alibaba.fastjson.JSON;
 import com.zjyx.vote.admin.param.VoteParam;
 import com.zjyx.vote.admin.viewmodel.BaseVM;
 import com.zjyx.vote.api.model.condition.VoteCdtn;
@@ -52,6 +56,21 @@ public class VoteController {
 		mv.addObject("statusList", Vote_Status.values());
 		mv.addObject("pageinfo", pageinfo);
 		mv.addObject("condition", voteCdtn);
+		Map<Long,List<VoteType>> zmap= (Map<Long, List<VoteType>>) pageinfo.getExtendInfo();
+		System.out.println(JSON.toJSONString(zmap));
+		mv.addObject("extendInfo", zmap);
+		Map<Long,Object> map = new HashMap<Long,Object>();
+		List<VoteType> x = new ArrayList<VoteType>();
+		VoteType v1 = new VoteType();
+		v1.setId(1);
+		v1.setType_name("a");
+		VoteType v2 = new VoteType();
+		v2.setId(2);
+		v2.setType_name("b");
+		x.add(v1);
+		x.add(v2);
+		map.put(1l, x);
+		mv.addObject("test", map);
 		return mv;
 	}
 	
@@ -108,6 +127,10 @@ public class VoteController {
 				return vm;
 			}
 		}
+        if(voteParam.getTypes() == null || voteParam.getTypes().isEmpty()){	
+        	vm.setErrorInfo(Error_Type.PARAM_ERROR, null, "请选择至少一个类型");
+			return vm;
+        }
 		Iterator<VoteOption> optionIt = options.iterator();
 		while(optionIt.hasNext()){
 			VoteOption option = optionIt.next();
@@ -136,7 +159,7 @@ public class VoteController {
 			vm.setErrorInfo(Error_Type.PARAM_ERROR, null, voteRuleReturnData.getErrorMessage());
 			return vm;
 		}
-		ReturnData<Vote> returnData= voteTransService.saveVote(vote, voteRule, options);
+		ReturnData<Vote> returnData= voteTransService.saveVote(vote, voteRule, options, voteParam.getTypes());
 		vm.setErrorInfo(returnData);
 		return vm;
 	}

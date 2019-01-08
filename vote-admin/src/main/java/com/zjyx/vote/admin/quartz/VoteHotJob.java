@@ -117,7 +117,7 @@ public class VoteHotJob {
     private List<VoteResult> getVoteRank(Map<String,List<Long>> map){
         final List<VoteResult> rankList = new LinkedList<VoteResult>();
     	//算出排行
-		if(!map.isEmpty()){
+		if(map!=null && !map.isEmpty()){
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.MINUTE, 0 - period);
 			int size = map.keySet().size();//记录表个数

@@ -19,7 +19,9 @@ import com.zjyx.vote.api.model.condition.VoteTypeCdn;
 import com.zjyx.vote.api.model.constants.RedisKey;
 import com.zjyx.vote.api.model.enums.Vote_Status;
 import com.zjyx.vote.api.model.persistence.Vote;
+import com.zjyx.vote.api.model.persistence.VoteType;
 import com.zjyx.vote.api.model.result.VoteResult;
+import com.zjyx.vote.api.model.result.VoteTypeResult;
 import com.zjyx.vote.api.service.IVoteService;
 import com.zjyx.vote.api.utils.VoteRecordUtils;
 import com.zjyx.vote.common.enums.Error_Type;
@@ -55,7 +57,13 @@ public class VoteServiceImpl implements IVoteService{
 		int counts = voteMapper.count(voteCdtn);
 		if(counts > 0){
 			List<Vote> list = voteMapper.list(voteCdtn);
-			pageInfo.setPageInfo(voteCdtn ,counts, list, null);
+			List<Long> voteIds = new ArrayList<Long>();
+			for(Vote vote:list){
+				voteIds.add(vote.getId());
+			}
+			List<VoteTypeResult> voteTypeResults = voteTypeRelateMapper.selectByVoteIds(voteIds);
+			Map<Long,List<VoteType>> map = VoteTypeResult.transToMap(voteTypeResults);
+			pageInfo.setPageInfo(voteCdtn ,counts, list, map);
 		}
 		return pageInfo;
 	}
@@ -281,6 +289,7 @@ public class VoteServiceImpl implements IVoteService{
 		}
 		//TODO JOY 删除需要判断是否有投票和统计数据
 		int flag = voteMapper.delelteById(id);
+		flag = voteTypeRelateMapper.deleteByVoteId(id);
 		returnData.setResultData(flag);
 		return returnData;
 	}

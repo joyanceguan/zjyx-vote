@@ -11,6 +11,6 @@ import com.zjyx.vote.common.model.ReturnData;
 
 public interface IVoteTransService {
 
-	public ReturnData<Vote> saveVote(VoteDto voteDto,VoteRuleDto ruleDto,List<VoteOption> voteOptions);
+	public ReturnData<Vote> saveVote(VoteDto voteDto,VoteRuleDto ruleDto,List<VoteOption> voteOptions,List<Integer> types);
 
 }

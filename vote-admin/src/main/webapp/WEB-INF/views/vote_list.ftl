@@ -52,6 +52,7 @@
                 <th class="name">标题</th>
                 <th class="process">状态</th>
                 <th class="node">选择类型</th>
+                <th class="node">类型</th>
                 <th class="time">时间</span></th>
                 <th class="operate">操作</th>
             </tr>
@@ -63,6 +64,11 @@
                 <td class="name">${vote.title}</td>
                 <td class="process">${vote.status.desc}</td>
                 <td class="node">${vote.vote_choose_type.desc}</td>
+                <td class="node">
+                  <#list extendInfo.get(vote.id) as typeInfo>
+                    ${typeInfo.type_name}
+                  </#list>
+                </td>
                 <td class="time">
                    起始时间${vote.begin_time?string("yyyy-MM-dd HH:mm")}/${vote.end_time?string("yyyy-MM-dd HH:mm")}
                 </td>

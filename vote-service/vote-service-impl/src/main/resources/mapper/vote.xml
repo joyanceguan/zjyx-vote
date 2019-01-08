@@ -110,7 +110,7 @@
                #{item}  
           </foreach>
           <if test="sort!=null and sort!=''">
-               #{sort}
+               ${sort}
           </if>
           limit 0,100
 	 </select>
