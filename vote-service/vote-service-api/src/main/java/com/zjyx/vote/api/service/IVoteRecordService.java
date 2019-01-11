@@ -1,5 +1,7 @@
 package com.zjyx.vote.api.service;
 
+import java.util.List;
+
 import com.zjyx.vote.api.model.condition.VoteRankListCdt;
 import com.zjyx.vote.api.model.persistence.User;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
@@ -9,12 +11,6 @@ import com.zjyx.vote.common.model.ReturnData;
 
 public interface IVoteRecordService {
 
-	/**
-	 * 给redis发送数据(有重试机制)
-	 * @param voteRecord
-	 * @return
-	 */
-	public ReturnData<Integer> save(VoteRecord voteRecord,User user);
 	
     /**
      * 根据条件排行	
@@ -22,4 +18,12 @@ public interface IVoteRecordService {
      * @return
      */
 	public PageInfo<VoteResult> rankList(VoteRankListCdt cdt);
+	
+	/**
+	 * 保存投票记录
+	 * @param records
+	 * @param user
+	 * @return
+	 */
+	public ReturnData<Integer> batchSave(List<VoteRecord> records,User user,Long voteId);
 }

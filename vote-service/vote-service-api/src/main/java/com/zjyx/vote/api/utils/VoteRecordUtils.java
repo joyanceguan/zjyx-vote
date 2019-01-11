@@ -46,4 +46,8 @@ public class VoteRecordUtils {
 		return tableName;
 	}
 	
+	public static String[] getAllTables(){
+		String[] array = new String[]{VOTE_RECORD_1,VOTE_RECORD_2,VOTE_RECORD_3,VOTE_RECORD_4};
+		return array;
+	}
 }

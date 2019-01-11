@@ -14,9 +14,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.stereotype.Service;
 
+import com.zjyx.vote.api.model.condition.SexRankCdt;
 import com.zjyx.vote.api.model.condition.VoteCdtn;
 import com.zjyx.vote.api.model.condition.VoteTypeCdn;
 import com.zjyx.vote.api.model.constants.RedisKey;
+import com.zjyx.vote.api.model.enums.Sex;
 import com.zjyx.vote.api.model.enums.Vote_Status;
 import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.api.model.persistence.VoteType;
@@ -292,6 +294,51 @@ public class VoteServiceImpl implements IVoteService{
 		flag = voteTypeRelateMapper.deleteByVoteId(id);
 		returnData.setResultData(flag);
 		return returnData;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PageInfo<Vote> sexRankList(SexRankCdt condition) {
+		PageInfo<Vote> pageInfo = new PageInfo<Vote>();
+		if(condition == null || condition.getCurrentPage() < 1 || condition.getOnePageSize() < 1 
+				|| condition.getSex() == null || condition.getSex() == Sex.unknown){
+			pageInfo.setErrorType(Error_Type.PARAM_ERROR);
+			return pageInfo;
+		}
+		//初始化数据
+		String redisKey = RedisKey.SEX_PREFIX + condition.getSex().getId();
+		Object v = redisTemplate.opsForValue().get(redisKey);
+		if(v == null){
+			return pageInfo;
+		}
+		List<VoteResult> vouchResultList= (List<VoteResult>) v;
+		if(vouchResultList == null || vouchResultList.isEmpty()){
+			return pageInfo;
+		}
+		int beginNum = condition.getBeginNum();
+		if(beginNum >= vouchResultList.size()){
+			return pageInfo;
+		}
+		int onePageSize = condition.getOnePageSize();
+		int endNum = beginNum + onePageSize;
+		if(endNum > vouchResultList.size()){
+			endNum = vouchResultList.size();
+		}
+		List<Long> ids = new ArrayList<Long>();
+		for(int i = beginNum ; i < endNum ; i++){
+			ids.add(vouchResultList.get(i).getId());
+		}
+		List<Vote> returnList = null; 
+		List<Vote> voteList = voteMapper.selectByIds(ids, null, null);
+		if(voteList!=null && voteList.size()>0){
+			Map<Long,Vote> map = Vote.listToMap(voteList);
+			returnList = new ArrayList<Vote>();
+			for(Long id:ids){
+				returnList.add(map.get(id));
+			}
+		}
+		pageInfo.setPageInfo(condition ,vouchResultList.size(), voteList, null);
+		return pageInfo;
 	}
 	
 }

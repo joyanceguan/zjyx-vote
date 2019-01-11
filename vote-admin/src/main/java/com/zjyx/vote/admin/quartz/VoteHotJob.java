@@ -191,7 +191,7 @@ public class VoteHotJob {
     	boolean isSuccess = false;
         while(index < retryTime && !isSuccess){
         	try{
-        	    redisTemplate.opsForValue().getAndSet(RedisKey.VOTE_HOT_KEY,rankedList);
+        	    redisTemplate.opsForValue().set(RedisKey.VOTE_HOT_KEY,rankedList);
         	    isSuccess = true;
         	}catch(Exception e){
         		//日志

@@ -16,9 +16,11 @@ import com.alibaba.fastjson.JSON;
 import com.zjyx.vote.api.model.condition.VoteRankListCdt;
 import com.zjyx.vote.api.model.constants.RedisKey;
 import com.zjyx.vote.api.model.dto.VoteRuleDto;
+import com.zjyx.vote.api.model.enums.Sex;
 import com.zjyx.vote.api.model.persistence.User;
 import com.zjyx.vote.api.model.persistence.Vote;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
+import com.zjyx.vote.api.model.result.VoteRecordResult;
 import com.zjyx.vote.api.model.result.VoteResult;
 import com.zjyx.vote.api.service.IVoteRecordService;
 import com.zjyx.vote.api.utils.VoteRecordUtils;
@@ -45,43 +47,20 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 	@Resource
 	VoteRecordMapper voteRecordMapper;
 	
-	@Override
-	public ReturnData<Integer> save(VoteRecord voteRecord,User user) {
-		ReturnData<Integer> returnData = verfiySave(voteRecord);
-		//参数校验
-		if(returnData.getErrorType()!=Error_Type.SUCCESS){
-			return returnData;
-		}
-		//投票规则校验
-		returnData = isCanVote(voteRecord,user);
-		if(returnData.getErrorType()!=Error_Type.SUCCESS){
-			return returnData;
-		}
-		voteRecord.setId(UUIDUtils.getUUId());
-		//发送redis 之后优化时做
-//		sendRecordToRedis(voteRecord); 
-		int flag = voteRecordMapper.save(voteRecord);
-		//更新统计redis
-		sendCountToRedis(voteRecord);
-		returnData.setResultData(flag);
-		return returnData;
-	}
 	
-	private ReturnData<Integer> isCanVote(VoteRecord voteRecord,User user){
+	private ReturnData<Integer> isCanVote(User user,Long vote_id){
 		ReturnData<Integer> returnData = new ReturnData<Integer>();
-		Long vote_id = voteRecord.getVote_id();
-		Long user_id = voteRecord.getUser_id();
 		Vote vote = voteMapper.selectById(vote_id);
 		String limitRule = vote.getLimit_rule();
 		VoteRuleDto voteRuleDto = JSON.parseObject(limitRule, VoteRuleDto.class);
 		//登录限制
-		if(voteRuleDto.isLoginLimit() || user == null){
-			if(voteRecord.getUser_id() == null){
+		if(voteRuleDto.isLoginLimit()){
+			if(user == null){
 				returnData.setErrorInfo(Error_Type.SERVICE_ERROR, ErrorCode.RULE_LIMIT, "登录限制");
 			    return returnData;
 			}
 			String table_name = VoteRecordUtils.getRecordTableName(vote);
-			List<VoteRecord> recordList = voteRecordMapper.getByVoteIdUserId(vote_id,user_id,table_name);
+			List<VoteRecordResult> recordList = voteRecordMapper.getByVoteIdUserId(vote_id,user.getId(),table_name);
 			//投票次数限制
 			if(voteRuleDto.isEveryoneTotalLimit()){
 				int everyoneCount = voteRuleDto.getEveryoneCount();
@@ -99,7 +78,7 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 				if(recordList!=null && recordList.size() > 0){
 					Date now = new Date();
 					Calendar c = Calendar.getInstance();
-					VoteRecord v = recordList.get(0);
+					VoteRecordResult v = recordList.get(0);
 					c.setTime(v.getCreate_time());
 					//获取时间最早的这条投票记录
 					do {
@@ -121,18 +100,16 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 					}
 			    }
 		    }
-			voteRecord.setAge(user.getAge());
-			voteRecord.setSex(user.getSex());
 		}else{
 			//非登录限制
 	    }
 		return returnData;
 	}
 	
-	private VoteRecord getFirst(List<VoteRecord> recordList,Date time){
-		VoteRecord voteRecord = null;
+	private VoteRecordResult getFirst(List<VoteRecordResult> recordList,Date time){
+		VoteRecordResult voteRecord = null;
 		for(int i=0;i<recordList.size();i++){
-			VoteRecord record = recordList.get(i);
+			VoteRecordResult record = recordList.get(i);
 		    if(record.getCreate_time().compareTo(time) >= 0){
 		    	voteRecord = record;
 		    	break;
@@ -141,9 +118,9 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 		return voteRecord;
 	}
 	
-	private int getSize(List<VoteRecord> recordList,Date time){
+	private int getSize(List<VoteRecordResult> recordList,Date time){
 		for(int i=0;i<recordList.size();i++){
-			VoteRecord record = recordList.get(i);
+			VoteRecordResult record = recordList.get(i);
 		    if(record.getCreate_time().compareTo(time) >= 0){
 		    	return recordList.size() - i;
 		    }
@@ -151,36 +128,42 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 		return 0;
 	}
 	
-	private ReturnData<Integer> verfiySave(VoteRecord voteRecord){
+	private ReturnData<Integer> verfiySave(List<VoteRecord> voteRecords){
 		ReturnData<Integer> returnData = new ReturnData<Integer>();
-		if(voteRecord == null){
+		if(voteRecords == null || voteRecords.isEmpty()){
 			returnData.setErrorType(Error_Type.PARAM_ERROR);
 			return returnData;
 		}
-		if(StringUtils.isBlank(voteRecord.getOption_desc())){
-			returnData.setErrorType(Error_Type.PARAM_ERROR);
-			return returnData;
-		}
-		if(voteRecord.getResponse_time() == null){
-			returnData.setErrorType(Error_Type.PARAM_ERROR);
-			return returnData;
-		}
-		if(voteRecord.getCreate_time() == null){
-			returnData.setErrorType(Error_Type.PARAM_ERROR);
-			return returnData;
-		}
-		if(voteRecord.getOption_id() == null || voteRecord.getOption_id() < 1){
-			returnData.setErrorType(Error_Type.PARAM_ERROR);
-			return returnData;
-		}
-		if(voteRecord.getSee_type() == null){
-			returnData.setErrorType(Error_Type.PARAM_ERROR);
-			return returnData;
-		}
-		if(voteRecord.getVote_id() == null){
-			returnData.setErrorType(Error_Type.PARAM_ERROR);
-			return returnData;
-		}
+        for(VoteRecord voteRecord:voteRecords){		
+        	if(voteRecord == null){
+    			returnData.setErrorType(Error_Type.PARAM_ERROR);
+    			return returnData;
+    		}
+    		if(StringUtils.isBlank(voteRecord.getOption_desc())){
+    			returnData.setErrorType(Error_Type.PARAM_ERROR);
+    			return returnData;
+    		}
+    		if(voteRecord.getResponse_time() == null){
+    			returnData.setErrorType(Error_Type.PARAM_ERROR);
+    			return returnData;
+    		}
+    		if(voteRecord.getCreate_time() == null){
+    			returnData.setErrorType(Error_Type.PARAM_ERROR);
+    			return returnData;
+    		}
+    		if(voteRecord.getOption_id() == null || voteRecord.getOption_id() < 1){
+    			returnData.setErrorType(Error_Type.PARAM_ERROR);
+    			return returnData;
+    		}
+    		if(voteRecord.getSee_type() == null){
+    			returnData.setErrorType(Error_Type.PARAM_ERROR);
+    			return returnData;
+    		}
+    		if(voteRecord.getVote_id() == null){
+    			returnData.setErrorType(Error_Type.PARAM_ERROR);
+    			return returnData;
+    		}
+        }
 		return returnData;
 	}
 	
@@ -222,11 +205,11 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
     /*
 	 * 发送投票记录给redis
 	 */
-    private Double countToRedis(VoteRecord voteRecord){
+    private Double countToRedis(Long voteId){
     	Double flag = null;
     	try{
     		//更新统计redis
-    		redisTemplate.opsForZSet().incrementScore(RedisKey.VOTE_RANK_KEY, voteRecord.getVote_id(), 1);
+    		redisTemplate.opsForZSet().incrementScore(RedisKey.VOTE_RANK_KEY, voteId, 1);
     	}catch(Exception e){
     		//日志
     		errorLog.error("save redis exception", e);
@@ -234,12 +217,12 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
     	return flag;
     }
     
-    private void resendCountToRedis(VoteRecord voteRecord,Double flag){
+    private void resendCountToRedis(Long voteId,Double flag){
     	//如果失败了 重试
         if(flag == null || flag < 1 ){
         	int retryTime = 0;
         	while(retryTime < VoteConstants.RESEND_REDIS_TIME && (flag == null || flag < 1)){
-        		flag = countToRedis(voteRecord);
+        		flag = countToRedis(voteId);
         		retryTime++;
             }
         	//如果重试几次还不成功,可以异步线程扔进数据库
@@ -249,9 +232,9 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
         }
     }
     
-    private void sendCountToRedis(VoteRecord voteRecord){
-    	Double flag = countToRedis(voteRecord);
-    	resendCountToRedis(voteRecord,flag);
+    private void sendCountToRedis(Long voteId){
+    	Double flag = countToRedis(voteId);
+    	resendCountToRedis(voteId,flag);
     }
 
 	@Override
@@ -268,6 +251,45 @@ public class VoteRecordServiceImpl implements IVoteRecordService{
 		List<VoteResult> list = voteRecordMapper.rankList(condition);
 		pageinfo.setPageInfo(condition ,Long.valueOf(count), list, null);
 		return pageinfo;
+	}
+
+	@Override
+	public ReturnData<Integer> batchSave(List<VoteRecord> records, User user,Long voteId) {
+		ReturnData<Integer> returnData = verfiySave(records);
+		//参数校验
+		if(returnData.getErrorType()!=Error_Type.SUCCESS){
+			return returnData;
+		}
+		//投票规则校验
+		returnData = isCanVote(user,voteId);
+		if(returnData.getErrorType()!=Error_Type.SUCCESS){
+			return returnData;
+		}
+		//赋值
+		String batchNum = UUIDUtils.getUUId();
+		int age = -1;
+		Sex sex = Sex.unknown;
+		Long userId = null;
+		if(user!=null){
+			age = user.getAge();
+			sex = user.getSex();
+			userId = user.getId();
+		}
+		for(VoteRecord voteRecord : records){
+			voteRecord.setVote_id(voteId);
+			voteRecord.setId(UUIDUtils.getUUId());
+			voteRecord.setBatch_num(batchNum);
+			voteRecord.setAge(age);
+			voteRecord.setSex(sex);
+			voteRecord.setUser_id(userId);
+		}
+		//发送redis 之后优化时做
+//		sendRecordToRedis(voteRecord); 
+		int flag = voteRecordMapper.batchSave(records);
+		//更新统计redis
+		sendCountToRedis(voteId);
+		returnData.setResultData(flag);
+		return returnData;
 	}
 	
 }

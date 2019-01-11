@@ -206,7 +206,7 @@ public class TypeRankJob {
     	boolean isSuccess = false;
         while(index < retryTime && !isSuccess){
         	try{
-        	    redisTemplate.opsForValue().getAndSet(RedisKey.TYPE_PREFIX + typeId, rankedList);
+        		redisTemplate.opsForValue().set(RedisKey.TYPE_PREFIX + typeId, rankedList);
         	    isSuccess = true;
         	}catch(Exception e){
         		//日志

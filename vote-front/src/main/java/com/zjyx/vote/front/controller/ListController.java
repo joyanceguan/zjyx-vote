@@ -49,6 +49,10 @@ public class ListController {
 	@RequestMapping("/random")
 	public ModelAndView random(){
 		ModelAndView mv = new ModelAndView("front/random");
+		if(WebContextHelper.isLogin()){
+			ReturnData<Vote> returnData = voteService.random(WebContextHelper.getUserId());
+			mv.addObject("vote", returnData.getResultData());
+		}
 		return mv;
 	}
 	
@@ -63,6 +67,13 @@ public class ListController {
 		}
 		ReturnData<Vote> returnData = voteService.random(userId);
 		vm.setErrorInfo(returnData);
+		return vm;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/sexRank")
+	public BaseVM sexRank(){
+		BaseVM vm = new BaseVM();
 		return vm;
 	}
 }

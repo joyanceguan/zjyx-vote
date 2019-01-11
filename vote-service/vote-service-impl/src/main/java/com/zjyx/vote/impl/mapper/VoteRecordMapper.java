@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.zjyx.vote.api.model.condition.VoteRankListCdt;
 import com.zjyx.vote.api.model.persistence.VoteRecord;
+import com.zjyx.vote.api.model.result.VoteRecordResult;
 import com.zjyx.vote.api.model.result.VoteResult;
 
 public interface VoteRecordMapper {
@@ -20,5 +21,5 @@ public interface VoteRecordMapper {
 	
 	public List<Long> getVoteIdByUser(@Param("table_name") String tableName,@Param("user_id")Long userId);
 	
-	public List<VoteRecord> getByVoteIdUserId(@Param("vote_id") Long vote_id,@Param("user_id")Long userId,@Param("table_name") String tableName);
+	public List<VoteRecordResult> getByVoteIdUserId(@Param("vote_id") Long vote_id,@Param("user_id")Long userId,@Param("table_name") String tableName);
 }

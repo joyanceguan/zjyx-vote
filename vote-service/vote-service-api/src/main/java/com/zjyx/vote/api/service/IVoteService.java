@@ -2,6 +2,7 @@ package com.zjyx.vote.api.service;
 
 import java.util.List;
 
+import com.zjyx.vote.api.model.condition.SexRankCdt;
 import com.zjyx.vote.api.model.condition.VoteCdtn;
 import com.zjyx.vote.api.model.condition.VoteTypeCdn;
 import com.zjyx.vote.api.model.enums.Vote_Status;
@@ -23,6 +24,8 @@ public interface IVoteService {
 	//分类
 	public PageInfo<Vote> typeList(VoteTypeCdn condition);
 	
+	//===============================以下为首页的各种接口===============================
+	
 	//热投
 	public List<Vote> hotList();
 	
@@ -34,5 +37,8 @@ public interface IVoteService {
 	
 	//分类投
 	public PageInfo<Vote> typeWithRankList(VoteTypeCdn condition);
+	
+	//根据用户行为统计投（目前写死只有性别，需要优化）
+	public PageInfo<Vote> sexRankList(SexRankCdt condition);
 	
 }

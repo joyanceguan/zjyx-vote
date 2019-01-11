@@ -26,7 +26,8 @@ public class VoteRecord {
 	private Date create_time;
 	//表名(非数据库字段名)
 	private String table_name;
-	
+	//批次号（一次投票标志）
+	private String batch_num;
 	//=======================以下是做统计的用户冗余字段=======================
 	//性别
 	private Sex sex;
@@ -104,6 +105,12 @@ public class VoteRecord {
 	}
 	public void setAge(int age) {
 		this.age = age;
+	}
+	public String getBatch_num() {
+		return batch_num;
+	}
+	public void setBatch_num(String batch_num) {
+		this.batch_num = batch_num;
 	}
 	
 }

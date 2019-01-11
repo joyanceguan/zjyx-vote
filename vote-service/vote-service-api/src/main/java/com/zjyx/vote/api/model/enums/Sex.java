@@ -3,7 +3,8 @@ package com.zjyx.vote.api.model.enums;
 public enum Sex {
 
 	male(1,"男"),
-	female(2,"女");
+	female(2,"女"),
+	unknown(3,"未知");
 	
 	private Sex(int id,String desc){
 		this.id = id;
@@ -32,6 +33,8 @@ public enum Sex {
 		  	return male;
 		  case 2:
 		  	return female;
+		  case 3:
+			return unknown;
 		  default:
 		  	break;
 		  }
