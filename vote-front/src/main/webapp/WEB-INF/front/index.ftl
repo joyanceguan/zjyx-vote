@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -218,8 +218,8 @@
 							<div class="portfolio-filter">
 								<ul style="float:left">
 									<li class="filter" data-filter="all">全部</li>
-									<li class="filter" data-filter=".photography">综艺</li>
-									<li class="filter" data-filter=".design">电影</li>
+									<li class="filter" data-filter=".photography">男生</li>
+									<li class="filter" data-filter=".design">女生</li>
 								</ul>
 							</div>
 						</div> <!-- /end col-lg-12 -->

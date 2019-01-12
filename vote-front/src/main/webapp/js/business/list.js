@@ -74,7 +74,7 @@ function votesHtml(votes){
 	   $("#skills").append(votelist);
 }
 
-var vote_html = "<div class=\"container\" id=\"portfolio-items-wrapper\" dataVal=\"vote_id\">"+
+var vote_html = "<div class=\"container\" id=\"portfolio-items-wrapper\" dataVal=\"vote_id\" onclick=\"window.location.href='/detail?id=vote_id'\">"+
                       "<div class=\"row\">"+
                           "<div class=\"col-md-5\">"+
                              "<div class=\"team-skills-content\">"+

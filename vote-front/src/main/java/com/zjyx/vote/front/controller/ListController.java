@@ -99,4 +99,5 @@ public class ListController {
 		vm = voteService.sexRankList(condition);
 		return vm;
 	}
+	
 }
