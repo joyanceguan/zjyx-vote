@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -145,46 +145,46 @@
 							<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
 									<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
 										<i class="tf-ios-alarm-outline"></i>
-										<h3>热投</h3>
+										<h3>系列投</h3>
 									</div>
 								</div>
 								<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
 										<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
 											<i class="tf-ios-alarm-outline"></i>
-											<h3>热投</h3>
+											<h3>X</h3>
 										</div>
 									</div>
-									<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
-											<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
-												<i class="tf-ios-alarm-outline"></i>
-												<h3>热投</h3>
-											</div>
-										</div>
 					<!-- end first count item -->
 				
 					<!-- second count item -->
-					<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
+					<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%" dataVal="technology" name="types">
+					    <div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
+						    <i class=" tf-ios-analytics-outline"></i>
+						    <h3>科技</h3>
+					    </div>
+				    </div>
+					<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%" dataVal="ent" name="types">
 						<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
 							<i class=" tf-ios-analytics-outline"></i>
-							<h3>随机投</h3>
+							<h3>娱乐</h3>
 						</div>
 					</div>
-					<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
+					<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%" dataVal="live" name="types">
 							<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
 								<i class=" tf-ios-analytics-outline"></i>
-								<h3>随机投</h3>
+								<h3>生活</h3>
 							</div>
 						</div>
-						<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
+						<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%" dataVal="international" name="types">
 								<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
 									<i class=" tf-ios-analytics-outline"></i>
-									<h3>随机投</h3>
+									<h3>国际</h3>
 								</div>
 							</div>
-							<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%">
+							<div class="col-md-5 col-sm-6 col-xs-2 text-center " style="width: 20%" dataVal="sports" name="types">
 									<div class="counters-item" style="font-size: 1px;padding-bottom:10px;">
 										<i class=" tf-ios-analytics-outline"></i>
-										<h3>随机投</h3>
+										<h3>体育</h3>
 									</div>
 								</div>
 				</div> 		<!-- end row -->
@@ -684,14 +684,17 @@
 		});
 		
 		$("#hotlist").click(function(){
-  			window.location.href = "/hotlist";
+  			window.location.href = "/list?page=hot";
 		});
 		$("#ranklist").click(function(){
-  			window.location.href = "/ranklist";
+  			window.location.href = "/list?page=rank";
 		});
-		
 		$("#random").click(function(){
   			window.location.href = "/random";
+		});
+		$("div[name='types']").click(function(){
+			var type = $(this).attr("dataVal");
+  			window.location.href = "/list?page="+type;
 		});
 	</script>
   </body>

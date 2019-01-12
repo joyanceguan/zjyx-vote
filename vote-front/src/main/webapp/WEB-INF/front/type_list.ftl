@@ -152,7 +152,7 @@
     <script src="js/vendor/jquery.vide.min.js"></script>
     <!-- Custom js -->
 	<script src="js/script.js"></script>
-	<script src="js/business/list.js"></script>
+	<script src="js/business/type_list.js"></script>
 	<script>
 		$("div[index-id='items']").click(function(){
   			window.location.href = "chart.html";

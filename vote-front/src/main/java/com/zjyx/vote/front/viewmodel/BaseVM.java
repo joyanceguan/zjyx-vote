@@ -1,6 +1,7 @@
 package com.zjyx.vote.front.viewmodel;
 
 import com.zjyx.vote.common.enums.Error_Type;
+import com.zjyx.vote.common.model.PageInfo;
 import com.zjyx.vote.common.model.ReturnData;
 
 public class BaseVM{
@@ -44,6 +45,13 @@ public class BaseVM{
 		this.errorMessage = errorMessage;
 	}
 	 
+	@SuppressWarnings("rawtypes")
+	public void setErrorInfo(PageInfo pageInfo){ 
+		this.errorCode = pageInfo.getErrorCode();
+		this.errorMessage = pageInfo.getErrorMessage();
+		this.errorType = pageInfo.getErrorType();
+	}
+	
 	@SuppressWarnings("rawtypes")
 	public void setErrorInfo(ReturnData returnData){ 
 		this.errorCode = returnData.getErrorCode();

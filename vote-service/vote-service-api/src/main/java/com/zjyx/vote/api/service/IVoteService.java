@@ -27,7 +27,7 @@ public interface IVoteService {
 	//===============================以下为首页的各种接口===============================
 	
 	//热投
-	public List<Vote> hotList();
+	public ReturnData<List<Vote>> hotList();
 	
 	//榜单投
 	public PageInfo<Vote> rankList(BasePageCondition condition);

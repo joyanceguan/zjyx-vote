@@ -151,10 +151,12 @@ public class VoteServiceImpl implements IVoteService{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Vote> hotList(){
+	public ReturnData<List<Vote>> hotList(){
+		ReturnData<List<Vote>> returnData = new ReturnData<List<Vote>>();
 		List<Vote> resultList = null;
-		List<VoteResult> list = (List<VoteResult>) redisTemplate.opsForValue().get(RedisKey.VOTE_HOT_KEY);
-	    if(list!=null && !list.isEmpty()){
+		Object v = redisTemplate.opsForValue().get(RedisKey.VOTE_HOT_KEY);
+	    if(v!=null){
+	    	List<VoteResult> list = (List<VoteResult>) v;
 	    	resultList = new ArrayList<Vote>();
 	    	List<Long> ids = new ArrayList<Long>();
 	    	for(VoteResult voteResult : list){
@@ -173,7 +175,8 @@ public class VoteServiceImpl implements IVoteService{
 	    	voteCdtn.setOnePageSize(rank);
 	    	resultList = voteMapper.list(voteCdtn);
 	    }
-	    return resultList;
+	    returnData.setResultData(resultList);
+	    return returnData;
 	}
 	
 	@Override
