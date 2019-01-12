@@ -88,16 +88,4 @@ public class ListController {
 		return returnData;
 	}
 	
-	@ResponseBody
-	@RequestMapping("/sexrank")
-	public PageInfo<Vote> sexRank(SexRankCdt condition){
-		PageInfo<Vote> vm = new PageInfo<Vote>();
-		if(condition.getSex() == null || condition.getSex() == Sex.unknown){
-			vm.setErrorType(Error_Type.PARAM_ERROR);
-			return vm;
-		}
-		vm = voteService.sexRankList(condition);
-		return vm;
-	}
-	
 }
